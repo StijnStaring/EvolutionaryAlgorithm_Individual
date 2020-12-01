@@ -3,6 +3,7 @@ class TravelingSalesPersonIndividual:
 
     def __init__(self):
         self.order = []
+        self.visited_vertices = set()
 
     def get_order(self):
         return self.order
