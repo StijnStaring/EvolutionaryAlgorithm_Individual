@@ -46,3 +46,6 @@ class TravelingSalesPersonProblem:
             path_weight += self.get_weight(a,b)
 
         return path_weight
+
+
+
