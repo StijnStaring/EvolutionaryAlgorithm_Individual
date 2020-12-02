@@ -3,12 +3,14 @@ from representation import TravelingSalesPersonProblem
 from random import shuffle
 from copy import deepcopy
 
-def opt_3_local_search(problem: TravelingSalesPersonProblem, route:list, max_swaps:int = 200):
+def opt_3_local_search(problem: TravelingSalesPersonProblem, route:list, max_swaps:int = 1000):
     """
     3 OPT Local search
     route: list of cities
     max_swaps: max amount of swaps
     updated list of cities, tour_cost
+    # local search is zo geschreven dat het bijna onafhankelijk is van de lengte van de tour
+    # Vooral enkel in het begin hebt verbetering
     """
     iteration = 1
     distance: float = 0
@@ -20,7 +22,8 @@ def opt_3_local_search(problem: TravelingSalesPersonProblem, route:list, max_swa
         for item in all_combinations:
             # item contains three indices: index1,index2,index3
 
-            route,distance,swap = generate_combinations(problem, route, item)
+            route,distance,swap,improvement = generate_combinations(problem, route, item)
+            print("The remaining distance: %s\tAmount of improvement: %s." % (distance,improvement))
 
             if swap:
                 break
@@ -37,7 +40,7 @@ def generate_combinations(problem: TravelingSalesPersonProblem,route,item):
     es1,es2,es3 = item
     ee1,ee2,ee3 = es1 +1, es2 + 1, es3 + 1
     length = len(route)
-    indices_start = [es1,ee1,es2]
+    indices_start = [es1,es2,es3]
 
     if ee1 >= length:
         ee1 = 0
@@ -77,7 +80,7 @@ def generate_combinations(problem: TravelingSalesPersonProblem,route,item):
 
     min_cost = initial_cost - improvement
 
-    return min_cand,min_cost,swap
+    return min_cand,min_cost,swap,improvement
 
 def cost_effect(problem,route,cand,indices_start,kind,initial_cost,min_cand,improvement):
 
@@ -88,7 +91,7 @@ def cost_effect(problem,route,cand,indices_start,kind,initial_cost,min_cand,impr
     if kind == 1:
         Ias = indices_start[0]
 
-        for value in [-1,2,1]:
+        for value in [-1,0,1]:
             I1 = Ias + value
             I2 = Ias + 1 + value
 
@@ -104,7 +107,7 @@ def cost_effect(problem,route,cand,indices_start,kind,initial_cost,min_cand,impr
     elif kind == 2:
         Ibs = indices_start[1]
 
-        for value in [-1, 2, 1]:
+        for value in [-1, 0, 1]:
             I1 = Ibs + value
             I2 = Ibs + 1 + value
 
@@ -120,7 +123,7 @@ def cost_effect(problem,route,cand,indices_start,kind,initial_cost,min_cand,impr
     elif kind == 3:
         Ics = indices_start[2]
 
-        for value in [-1, 2, 1]:
+        for value in [-1, 0, 1]:
             I1 = Ics + value
             I2 = Ics + 1 + value
 
@@ -136,7 +139,7 @@ def cost_effect(problem,route,cand,indices_start,kind,initial_cost,min_cand,impr
     elif kind == 4:
 
         for I in [indices_start[1], indices_start[2]]:
-            for value in [-1, 2, 1]:
+            for value in [-1, 0, 1]:
                 I1 = I + value
                 I2 = I + 1 + value
 
@@ -151,7 +154,7 @@ def cost_effect(problem,route,cand,indices_start,kind,initial_cost,min_cand,impr
 
     elif kind == 5:
         for I in [indices_start[0], indices_start[2]]:
-            for value in [-1, 2, 1]:
+            for value in [-1, 0, 1]:
                 I1 = I + value
                 I2 = I + 1 + value
 
@@ -166,7 +169,7 @@ def cost_effect(problem,route,cand,indices_start,kind,initial_cost,min_cand,impr
 
     elif kind == 6:
         for I in [indices_start[0], indices_start[1]]:
-            for value in [-1, 2, 1]:
+            for value in [-1, 0, 1]:
                 I1 = I + value
                 I2 = I + 1 + value
 
@@ -181,7 +184,7 @@ def cost_effect(problem,route,cand,indices_start,kind,initial_cost,min_cand,impr
 
     elif kind == 7:
         for I in [indices_start[0], indices_start[1], indices_start[2]]:
-            for value in [-1, 2, 1]:
+            for value in [-1, 0, 1]:
                 I1 = I + value
                 I2 = I + 1 + value
 
@@ -228,3 +231,21 @@ def swapPositions(list_input:list, pos1, pos2):
     copy_list =  deepcopy(list_input)
     copy_list[pos1], copy_list[pos2] = copy_list[pos2], copy_list[pos1] # changes original list because do an operation on the elements
     return copy_list
+
+
+
+def run(filename = "tour929.csv"):
+    import numpy as np
+    try_list = list(range(929))
+    shuffle(try_list)
+    file = open(filename)
+    distanceMatrix = np.loadtxt(file, delimiter=",")
+    file.close()
+    problem: TravelingSalesPersonProblem = TravelingSalesPersonProblem(distanceMatrix)
+    print("Running...")
+    result = opt_3_local_search(problem,try_list,200)
+    print("Finished")
+    return result
+
+
+run()
