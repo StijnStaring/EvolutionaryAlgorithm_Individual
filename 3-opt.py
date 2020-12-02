@@ -1,4 +1,3 @@
-import numpy as np
 import itertools
 from representation import TravelingSalesPersonProblem
 from random import shuffle
@@ -21,7 +20,7 @@ def opt_3_local_search(problem: TravelingSalesPersonProblem, route:list, max_swa
         for item in all_combinations:
             # item contains three indices: index1,index2,index3
 
-            route, distance,swap = generate_combinations(problem, route, item)
+            route,distance,swap = generate_combinations(problem, route, item)
 
             if swap:
                 break
@@ -38,7 +37,7 @@ def generate_combinations(problem: TravelingSalesPersonProblem,route,item):
     es1,es2,es3 = item
     ee1,ee2,ee3 = es1 +1, es2 + 1, es3 + 1
     length = len(route)
-    indices = [es1,ee1,es2,ee2,es3,ee3]
+    indices_start = [es1,ee1,es2]
 
     if ee1 >= length:
         ee1 = 0
@@ -48,9 +47,6 @@ def generate_combinations(problem: TravelingSalesPersonProblem,route,item):
 
     if ee3 >= length:
         ee3 = 0
-
-    if len({es1,es2,es3,ee1,ee2,ee3}) != 6:
-        raise Exception("Should be 6 different indices!")
 
     # Order that is shown here is of importance!
     combo1 = swapPositions(route,es1,ee1) #A'BC
@@ -66,42 +62,158 @@ def generate_combinations(problem: TravelingSalesPersonProblem,route,item):
     combo7_temp2 = swapPositions(combo7_temp1, es2, ee2)
     combo7 = swapPositions(combo7_temp2, es3, ee3)
 
+    initial_cost = cost(problem, route)
     min_cand = route
-    min_cost = cost(problem,route)
-    cost_route = min_cost
+    improvement = 0
     swap = True
     kind = 1
     for cand in [combo1, combo2, combo3, combo4, combo5, combo6, combo7]:
-        improvement = False
-        min_cand,min_cost,improvement = cost_effect(cost_route,min_cost,cand,indices,kind)
 
-        if improvement:
-            min_cand = cand
-
+        min_cand,improvement = cost_effect(problem,route,cand,indices_start,kind,initial_cost,min_cand,improvement)
         kind += 1
 
-    if min_cost == cost_route:
+    if improvement == 0:
         swap = False
+
+    min_cost = initial_cost - improvement
 
     return min_cand,min_cost,swap
 
-def cost_effect(cost_route,min_cost,cand,indices,kind):
+def cost_effect(problem,route,cand,indices_start,kind,initial_cost,min_cand,improvement):
 
-    if kind <= 3: # 1 swap
+    amount_cities = len(route)
+    original_edges = set()
+    new_edges = set()
 
-    elif kind <= 6: # 2 swaps
+    if kind == 1:
+        Ias = indices_start[0]
 
-    else: # 3 swaps
+        for value in [-1,2,1]:
+            I1 = Ias + value
+            I2 = Ias + 1 + value
+
+            if I1 >= amount_cities:
+                I1 -= amount_cities
+
+            if I2 >= amount_cities:
+                I2 -= amount_cities
+
+            original_edges.add((route[I1],route[I2]))
+            new_edges.add((cand[I1],cand[I2]))
+
+    elif kind == 2:
+        Ibs = indices_start[1]
+
+        for value in [-1, 2, 1]:
+            I1 = Ibs + value
+            I2 = Ibs + 1 + value
+
+            if I1 >= amount_cities:
+                I1 -= amount_cities
+
+            if I2 >= amount_cities:
+                I2 -= amount_cities
+
+            original_edges.add((route[I1], route[I2]))
+            new_edges.add((cand[I1], cand[I2]))
+
+    elif kind == 3:
+        Ics = indices_start[2]
+
+        for value in [-1, 2, 1]:
+            I1 = Ics + value
+            I2 = Ics + 1 + value
+
+            if I1 >= amount_cities:
+                I1 -= amount_cities
+
+            if I2 >= amount_cities:
+                I2 -= amount_cities
+
+            original_edges.add((route[I1], route[I2]))
+            new_edges.add((cand[I1], cand[I2]))
+
+    elif kind == 4:
+
+        for I in [indices_start[1], indices_start[2]]:
+            for value in [-1, 2, 1]:
+                I1 = I + value
+                I2 = I + 1 + value
+
+                if I1 >= amount_cities:
+                    I1 -= amount_cities
+
+                if I2 >= amount_cities:
+                    I2 -= amount_cities
+
+                original_edges.add((route[I1], route[I2]))
+                new_edges.add((cand[I1], cand[I2]))
+
+    elif kind == 5:
+        for I in [indices_start[0], indices_start[2]]:
+            for value in [-1, 2, 1]:
+                I1 = I + value
+                I2 = I + 1 + value
+
+                if I1 >= amount_cities:
+                    I1 -= amount_cities
+
+                if I2 >= amount_cities:
+                    I2 -= amount_cities
+
+                original_edges.add((route[I1], route[I2]))
+                new_edges.add((cand[I1], cand[I2]))
+
+    elif kind == 6:
+        for I in [indices_start[0], indices_start[1]]:
+            for value in [-1, 2, 1]:
+                I1 = I + value
+                I2 = I + 1 + value
+
+                if I1 >= amount_cities:
+                    I1 -= amount_cities
+
+                if I2 >= amount_cities:
+                    I2 -= amount_cities
+
+                original_edges.add((route[I1], route[I2]))
+                new_edges.add((cand[I1], cand[I2]))
+
+    elif kind == 7:
+        for I in [indices_start[0], indices_start[1], indices_start[2]]:
+            for value in [-1, 2, 1]:
+                I1 = I + value
+                I2 = I + 1 + value
+
+                if I1 >= amount_cities:
+                    I1 -= amount_cities
+
+                if I2 >= amount_cities:
+                    I2 -= amount_cities
+
+                original_edges.add((route[I1], route[I2]))
+                new_edges.add((cand[I1], cand[I2]))
 
 
 
+    original_path_weight = 0
+    for (a, b) in original_edges:
+        original_path_weight += problem.get_weight(a, b)
+
+    new_path_weight = 0
+    for (a, b) in new_edges:
+        new_path_weight += problem.get_weight(a, b)
+
+    new_improvement = original_path_weight - new_path_weight
+
+    if new_improvement > improvement:
+        return cand, new_improvement
+
+    else:
+        return min_cand,improvement
 
 
-
-
-
-# can also go over everything and calculate the minimum --> more exploitation
-def cost(problem: TravelingSalesPersonProblem,order): # improve the cost calculation --> not go over everything but only check what is changed in comparence with the previous calculation
+def cost(problem: TravelingSalesPersonProblem,order):
     visited_edges = [(order[i], order[i + 1]) for i in range(0, len(order) - 1)]
     visited_edges += [(order[len(order) - 1], order[0])]
 
