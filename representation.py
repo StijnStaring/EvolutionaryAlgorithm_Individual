@@ -1,19 +1,35 @@
+import numpy as np
 
 class TravelingSalesPersonIndividual:
 
     def __init__(self):
         self.order = []
-        self.visited_vertices = set()
+        self.cost = np.nan
+        self.edges = []
+        # self.visited_vertices = set()
 
     def get_order(self):
         return self.order
 
-    def get_visited_vertices(self):
-        return self.visited_vertices
+    def get_cost(self):
+        return self.cost
+
+    def get_edges(self):
+        return self.edges
+
+
+    # def get_visited_vertices(self):
+    #     return self.visited_vertices
 
     def set_order(self, new_order):
         self.order = new_order
-        self.visited_vertices = set(new_order)
+        # self.visited_vertices = set(new_order)
+
+    def set_cost(self, new_cost):
+        self.cost = new_cost
+
+    def set_edges(self, new_edges):
+        self.edges = new_edges
 
     def __str__(self) -> str:
         return str(self.get_order())
@@ -32,8 +48,8 @@ class TravelingSalesPersonProblem:
 
     def calculate_individual_score(self, individual: TravelingSalesPersonIndividual):
         # Check if the individual visits all nodes.
-        if self.visited_vertices != individual.get_visited_vertices():
-            return float('inf')
+        # if self.visited_vertices != individual.get_visited_vertices():
+        #     return float('inf')
         
         order = individual.get_order()
         if len(order) == 0:

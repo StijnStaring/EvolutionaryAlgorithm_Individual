@@ -1,6 +1,6 @@
 import itertools
 from representation import TravelingSalesPersonProblem
-from random import shuffle,randint
+from random import randint
 from copy import deepcopy
 
 def opt_3_local_search(problem: TravelingSalesPersonProblem, route:list, max_iterations:int = 1000):
@@ -16,7 +16,6 @@ def opt_3_local_search(problem: TravelingSalesPersonProblem, route:list, max_ite
     iteration = 1
     tried_combinations = []
     distance: float = 0
-    swap: bool = False
 
     # Don't check possibilities --> assume that not possible to check them all
     # possibilities = 0
@@ -55,7 +54,7 @@ def opt_3_local_search(problem: TravelingSalesPersonProblem, route:list, max_ite
             # item contains three indices: index1,index2,index3
 
         route,distance,swap,improvement = generate_combinations(problem, route, item)
-        print("The remaining distance: %s\tAmount of improvement: %s." % (distance,improvement))
+        # print("The remaining distance: %s\tAmount of improvement: %s." % (distance,improvement))
 
         if swap:
             tried_combinations = []
@@ -105,7 +104,7 @@ def generate_combinations(problem: TravelingSalesPersonProblem,route,item):
     kind = 1
     for cand in [combo1, combo2, combo3, combo4, combo5, combo6, combo7]:
 
-        min_cand,improvement = cost_effect(problem,route,cand,indices_start,kind,initial_cost,min_cand,improvement)
+        min_cand,improvement = cost_effect(problem,route,cand,indices_start,kind,min_cand,improvement)
         kind += 1
 
     if improvement == 0:
@@ -115,7 +114,7 @@ def generate_combinations(problem: TravelingSalesPersonProblem,route,item):
 
     return min_cand,min_cost,swap,improvement
 
-def cost_effect(problem,route,cand,indices_start,kind,initial_cost,min_cand,improvement):
+def cost_effect(problem,route,cand,indices_start,kind,min_cand,improvement):
 
     amount_cities = len(route)
     original_edges = set()

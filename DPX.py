@@ -1,0 +1,6 @@
+from representation import TravelingSalesPersonProblem
+from representation import TravelingSalesPersonIndividual
+
+def DPX(problem:TravelingSalesPersonProblem, parent_one:TravelingSalesPersonIndividual, parent_two:TravelingSalesPersonIndividual):
+
+
