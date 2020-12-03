@@ -1,9 +1,9 @@
 import itertools
 from representation import TravelingSalesPersonProblem
-from random import shuffle
+from random import shuffle,randint
 from copy import deepcopy
 
-def opt_3_local_search(problem: TravelingSalesPersonProblem, route:list, max_swaps:int = 1000):
+def opt_3_local_search(problem: TravelingSalesPersonProblem, route:list, max_iterations:int = 1000):
     """
     3 OPT Local search
     route: list of cities
@@ -12,24 +12,57 @@ def opt_3_local_search(problem: TravelingSalesPersonProblem, route:list, max_swa
     # local search is zo geschreven dat het bijna onafhankelijk is van de lengte van de tour
     # Vooral enkel in het begin hebt verbetering
     """
+    amount_of_cities = len(route)
     iteration = 1
+    tried_combinations = []
     distance: float = 0
     swap: bool = False
-    while iteration <= max_swaps:
-        all_combinations = list(itertools.combinations(range(len(route)), 3)) # all possible selections of edges
-        shuffle(all_combinations) # needed?
 
-        for item in all_combinations:
+    # Don't check possibilities --> assume that not possible to check them all
+    # possibilities = 0
+    # for i in range(amount_of_cities):
+    #     for j in range(i + 1, amount_of_cities):
+    #         for k in range(j + 1, amount_of_cities):
+    #             possibilities += 1
+
+    while iteration <= max_iterations:
+
+        random_edge1 = 0
+        random_edge2 = 0
+        random_edge3 = 0
+        check: bool = False
+        it = 0
+        while (random_edge1 == random_edge2 and random_edge1 == random_edge3 and random_edge2 == random_edge3) or (not check):
+
+            random_edge1 = randint(0,amount_of_cities - 1)
+            random_edge2 = randint(0, amount_of_cities - 1)
+            random_edge3 = randint(0, amount_of_cities - 1)
+
+            if all(list(map(lambda x: x not in tried_combinations,itertools.permutations([random_edge1,random_edge2,random_edge3], 3)))):
+                check = True
+
+            if it == 1000:
+                raise Exception("Can't find a new candidate.")
+
+            it += 1
+
+        item = (random_edge1,random_edge2,random_edge3)
+        tried_combinations.append(item)
+        # all_combinations = list(itertools.combinations(range(len(route)), 3)) # all possible selections of edges
+        # shuffle(all_combinations) # needed?
+
+        # for item in all_combinations:
             # item contains three indices: index1,index2,index3
 
-            route,distance,swap,improvement = generate_combinations(problem, route, item)
-            print("The remaining distance: %s\tAmount of improvement: %s." % (distance,improvement))
+        route,distance,swap,improvement = generate_combinations(problem, route, item)
+        print("The remaining distance: %s\tAmount of improvement: %s." % (distance,improvement))
 
-            if swap:
-                break
+        if swap:
+            tried_combinations = []
 
-        if not swap:
-            break
+
+        # if not swap: Assume that the algorithm will never reach all the possible swaps
+        #     break
 
         iteration += 1
 
@@ -216,7 +249,7 @@ def cost_effect(problem,route,cand,indices_start,kind,initial_cost,min_cand,impr
         return min_cand,improvement
 
 
-def cost(problem: TravelingSalesPersonProblem,order):
+def cost(problem: TravelingSalesPersonProblem,order:list):
     visited_edges = [(order[i], order[i + 1]) for i in range(0, len(order) - 1)]
     visited_edges += [(order[len(order) - 1], order[0])]
 
@@ -243,7 +276,8 @@ def run(filename = "tour929.csv"):
     file.close()
     problem: TravelingSalesPersonProblem = TravelingSalesPersonProblem(distanceMatrix)
     print("Running...")
-    result = opt_3_local_search(problem,try_list,200)
+    result,cost_out = opt_3_local_search(problem,try_list,10)
+
     print("Finished")
     return result
 
