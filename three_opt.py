@@ -2,8 +2,8 @@ import itertools
 from representation import TravelingSalesPersonProblem
 from random import randint
 from copy import deepcopy
-
-def opt_3_local_search(problem: TravelingSalesPersonProblem, route:list, max_iterations:int = 1000):
+# (problem, candidate,cost_candidate,edges_candidate, max_iterations = 50)
+def opt_3_local_search(problem: TravelingSalesPersonProblem, route:list, cost_route:float, edges_route:list, max_iterations:int = 1000):
     """
     3 OPT Local search
     route: list of cities
@@ -53,7 +53,7 @@ def opt_3_local_search(problem: TravelingSalesPersonProblem, route:list, max_ite
         # for item in all_combinations:
             # item contains three indices: index1,index2,index3
 
-        route,distance,swap,improvement = generate_combinations(problem, route, item)
+        route,distance,edges_route,swap,improvement = generate_combinations(problem, route, cost_route, edges_route, item)
         # print("The remaining distance: %s\tAmount of improvement: %s." % (distance,improvement))
 
         if swap:
@@ -65,9 +65,9 @@ def opt_3_local_search(problem: TravelingSalesPersonProblem, route:list, max_ite
 
         iteration += 1
 
-    return route, distance
+    return route, distance, edges_route
 
-def generate_combinations(problem: TravelingSalesPersonProblem,route,item):
+def generate_combinations(problem: TravelingSalesPersonProblem,route,cost_route, edges_route,item):
 
     es1,es2,es3 = item
     ee1,ee2,ee3 = es1 +1, es2 + 1, es3 + 1
@@ -97,22 +97,29 @@ def generate_combinations(problem: TravelingSalesPersonProblem,route,item):
     combo7_temp2 = swapPositions(combo7_temp1, es2, ee2)
     combo7 = swapPositions(combo7_temp2, es3, ee3)
 
-    initial_cost = cost(problem, route)
     min_cand = route
-    improvement = 0
+    improvement_old = 0
     swap = True
     kind = 1
+    remember = 0
     for cand in [combo1, combo2, combo3, combo4, combo5, combo6, combo7]:
 
-        min_cand,improvement = cost_effect(problem,route,cand,indices_start,kind,min_cand,improvement)
+        min_cand,improvement,original_edges,new_edges = cost_effect(problem,route,cand,indices_start,kind,min_cand,improvement_old)
+        if improvement != improvement_old:
+            remember_oe = original_edges # keeps track of which combo made the last improvement
+            remember_ne = new_edges
         kind += 1
 
     if improvement == 0:
         swap = False
 
-    min_cost = initial_cost - improvement
+    else:
+        edges_route = [edges_route.remove(x) for x in original_edges]
+        edges_route = [edges_route.add(x) for x in original_edges]
 
-    return min_cand,min_cost,swap,improvement
+    min_cost = cost_route - improvement
+
+    return min_cand,min_cost, edges_route,swap,improvement
 
 def cost_effect(problem,route,cand,indices_start,kind,min_cand,improvement):
 
@@ -242,21 +249,21 @@ def cost_effect(problem,route,cand,indices_start,kind,min_cand,improvement):
     new_improvement = original_path_weight - new_path_weight
 
     if new_improvement > improvement:
-        return cand, new_improvement
+        return cand, new_improvement, original_edges, new_edges
 
     else:
-        return min_cand,improvement
+        return min_cand,improvement,original_edges,new_edges
 
 
-def cost(problem: TravelingSalesPersonProblem,order:list):
-    visited_edges = [(order[i], order[i + 1]) for i in range(0, len(order) - 1)]
-    visited_edges += [(order[len(order) - 1], order[0])]
-
-    path_weight = 0
-    for (a,b) in visited_edges:
-        path_weight += problem.get_weight(a,b)
-
-    return path_weight
+# def cost(problem: TravelingSalesPersonProblem,order:list):
+#     visited_edges = [(order[i], order[i + 1]) for i in range(0, len(order) - 1)]
+#     visited_edges += [(order[len(order) - 1], order[0])]
+#
+#     path_weight = 0
+#     for (a,b) in visited_edges:
+#         path_weight += problem.get_weight(a,b)
+#
+#     return path_weight
 
 
 def swapPositions(list_input:list, pos1, pos2):

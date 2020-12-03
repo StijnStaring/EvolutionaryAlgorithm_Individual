@@ -28,40 +28,40 @@ def Nearest_Neighbor(amount_of_cities_to_visit, cost_matrix_original):
 
 
 
-def cost(problem: TravelingSalesPersonProblem,order:list):
-    visited_edges = [(order[i], order[i + 1]) for i in range(0, len(order) - 1)]
-    visited_edges += [(order[len(order) - 1], order[0])]
-
-    path_weight = 0
-    for (a,b) in visited_edges:
-        print("(%s,%s) " % (a,b) )
-        path_weight += problem.get_weight(a,b)
-
-    return path_weight
-
-
+# def cost(problem: TravelingSalesPersonProblem,order:list):
+#     visited_edges = [(order[i], order[i + 1]) for i in range(0, len(order) - 1)]
+#     visited_edges += [(order[len(order) - 1], order[0])]
+#
+#     path_weight = 0
+#     for (a,b) in visited_edges:
+#         print("(%s,%s) " % (a,b) )
+#         path_weight += problem.get_weight(a,b)
+#
+#     return path_weight
 
 
-def run(filename = "tour929.csv"):
-    import numpy as np
-    from random import shuffle
-    try_list = list(range(929))
-    shuffle(try_list)
-    file = open(filename)
-    distanceMatrix = np.loadtxt(file, delimiter=",")
-    problem = TravelingSalesPersonProblem(distanceMatrix)
-    file.close()
-    all_costs = []
-    print("Running...")
-    for i in range(100):
-        candidate,NN_cost,NN_edge = Nearest_Neighbor(len(try_list),distanceMatrix)
-        # candidate,costss = opt_3_local_search(problem, candidate, max_iterations = 50)
-        # all_costs.append(costss)
-        # print("Candidate: %s ; NN_cost: %s ; NN_edge: %s ;" % (candidate,NN_cost,NN_edge))
 
-    # print("The mean cost is: %s." % (sum(all_costs)/len(all_costs)))
-    #     print(len(candidate))
 
-    print("Finished")
-
-run()
+# def run(filename = "tour929.csv"):
+#     import numpy as np
+#     from random import shuffle
+#     try_list = list(range(929))
+#     shuffle(try_list)
+#     file = open(filename)
+#     distanceMatrix = np.loadtxt(file, delimiter=",")
+#     problem = TravelingSalesPersonProblem(distanceMatrix)
+#     file.close()
+#     all_costs = []
+#     print("Running...")
+#     for i in range(100):
+#         candidate,NN_cost,NN_edge = Nearest_Neighbor(len(try_list),distanceMatrix)
+#         # candidate,costss = opt_3_local_search(problem, candidate, max_iterations = 50)
+#         # all_costs.append(costss)
+#         # print("Candidate: %s ; NN_cost: %s ; NN_edge: %s ;" % (candidate,NN_cost,NN_edge))
+#
+#     # print("The mean cost is: %s." % (sum(all_costs)/len(all_costs)))
+#     #     print(len(candidate))
+#
+#     print("Finished")
+#
+# run()

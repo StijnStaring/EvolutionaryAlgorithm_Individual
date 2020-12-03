@@ -22,10 +22,11 @@ class r0620003:
         for _ in range(initial_population_size):
 
             indiv: TravelingSalesPersonIndividual = TravelingSalesPersonIndividual()
-            candidate = Nearest_Neighbor(amount_of_cities_to_visit, problem.weights)
-            candidate,cost_candidate = opt_3_local_search(problem, candidate, max_iterations = 50) # how long have to search is a trade off between cost and profit
+            candidate,cost_candidate,edges_candidate = Nearest_Neighbor(amount_of_cities_to_visit, problem.weights)
+            candidate,cost_candidate,edges_candidate = opt_3_local_search(problem, candidate,cost_candidate,edges_candidate, max_iterations = 50) # how long have to search is a trade off between cost and profit
             indiv.set_order(candidate)
             indiv.set_cost(cost_candidate)
+            indiv.set_edges(edges_candidate)
             population.append(indiv)
 
         return population
