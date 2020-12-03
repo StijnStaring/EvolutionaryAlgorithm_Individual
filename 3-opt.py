@@ -266,20 +266,20 @@ def swapPositions(list_input:list, pos1, pos2):
     return copy_list
 
 
-
-def run(filename = "tour929.csv"):
-    import numpy as np
-    try_list = list(range(929))
-    shuffle(try_list)
-    file = open(filename)
-    distanceMatrix = np.loadtxt(file, delimiter=",")
-    file.close()
-    problem: TravelingSalesPersonProblem = TravelingSalesPersonProblem(distanceMatrix)
-    print("Running...")
-    result,cost_out = opt_3_local_search(problem,try_list,10)
-
-    print("Finished")
-    return result
-
-
-run()
+#
+# def run(filename = "tour929.csv"):
+#     import numpy as np
+#     try_list = list(range(929))
+#     shuffle(try_list)
+#     file = open(filename)
+#     distanceMatrix = np.loadtxt(file, delimiter=",")
+#     file.close()
+#     problem: TravelingSalesPersonProblem = TravelingSalesPersonProblem(distanceMatrix)
+#     print("Running...")
+#     result,cost_out = opt_3_local_search(problem,try_list,10)
+#
+#     print("Finished")
+#     return result
+#
+#
+# run()
