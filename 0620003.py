@@ -31,6 +31,8 @@ class r0620003:
             indiv.set_cost(cost_candidate)
             # indiv.set_edges(edges_candidate)
             population.append(indiv)
+        sorted_population = sorted(population, key=lambda individual: individual.get_cost())
+        print('after NN best score: %s'% sorted_population[0].get_cost())
 
         return population
 
@@ -62,14 +64,24 @@ class r0620003:
                 population.insert(0,bestScore_individual)
 
             offsprings: list = list()
-            for _ in range(int(initial_population_size/2)):
+            for _ in range(initial_population_size):
+            # for _ in range(int(10)):
                 # Select best candidates
                 parent_one: TravelingSalesPersonIndividual = k_tournament(population, k) # Can also try the selection with increasing exploitation --> decreasing s
                 parent_two: TravelingSalesPersonIndividual = k_tournament(population, k)
 
                 # Produce new offspring
                 offspring = DPX(distanceMatrix,parent_one,parent_two)
-                offsprings.append(offspring)
+                # print(offspring.get_order())
+                # o = offspring.get_order()
+                # if len(set(o)) != 29:
+                #     raise Exception("error1")
+                # oc = offspring.get_cost()
+                # if oc == np.inf or oc <27000:
+                #     raise Exception("error2")
+
+                # offsprings.append(offspring)
+
                 # offspring_route1,offspring_cost1,offspring_edges1,offspring_route2,offspring_cost2,offspring_edges2 = DPX(problem, parent_one, parent_two)
                 # offspring_route1, cost_offspring1 = opt_3_local_search(problem, offspring_route1, max_iterations=50)
                 # offspring_route2, cost_offspring2 = opt_3_local_search(problem, offspring_route2, max_iterations=50)
@@ -83,18 +95,23 @@ class r0620003:
                 # offspring2.set_edges(offspring_edges2)
                 # offsprings.append(offspring1)
                 # offsprings.append(offspring2)
+                # print(offspring.get_cost())
+                population[randint(0,amount_of_cities_to_visit - 1)] = offspring
+            #     not good elimination!!! 
 
-            population += offsprings
+            # population = offsprings
             # population = [Greedy_Mutation(problem,indi) for indi in population]
 
-            population = elimination(population, initial_population_size)
+            # population = elimination(population, initial_population_size)
 
             if iteration > 1:
                 bestScore_prev = history_best_objectives[-1]
             else:
                 bestScore_prev = 0
 
-            bestScore_individual = population[0]
+            sorted_population = sorted(population, key=lambda individual: individual.get_cost())
+            bestScore_individual = sorted_population[0]
+            # bestScore_individual = population[0]
             bestScore_current = bestScore_individual.get_cost()
 
             print("%s\t %s" % (np.around(bestScore_current,4),np.around(bestScore_prev,4)))
@@ -138,4 +155,4 @@ def run(args):
     return result
 
 
-run((100, 1, 0.02, 100))
+run((100, 5, 0.02, 100))
