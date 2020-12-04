@@ -7,7 +7,7 @@ from three_opt import opt_3_local_search
 def Nearest_Neighbor(amount_of_cities_to_visit, cost_matrix_original):
     cost_matrix = deepcopy(cost_matrix_original)
     NN_route = []
-    NN_edges = []
+    # NN_edges = []
     random_city = randint(0,amount_of_cities_to_visit - 1)
     NN_route.append(random_city)
     current_city = random_city

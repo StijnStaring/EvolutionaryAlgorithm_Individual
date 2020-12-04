@@ -7,6 +7,9 @@ from representation import TravelingSalesPersonIndividual, TravelingSalesPersonP
 from Nearest_Neighbor import Nearest_Neighbor
 from three_opt import *
 from elimination import elimination
+from DPX import DPX
+from SCX import SCX
+# from DPX import DPX
 # from inversion import inversion  # should be in the same file when submit
 
 
@@ -32,7 +35,7 @@ class r0620003:
         return population
 
     # The evolutionary algorithm's main loop
-    def optimize(self, filename, initial_population_size: int = 100, k:int = 5, mutation: float = 0.02, termination_value: int = 50):
+    def optimize(self, filename, initial_population_size: int = 100, k:int = 5, mutation_rate: float = 0.02, termination_value: int = 50):
         # def optimize(self, filename, initial_population_size: int = 100, amount_of_offsprings: int = 100, k: int = 5,alpha: float = .2, recombination_rate: float = 1, result_history_length: int = 50,termination_value: float = 0.005):
         # Read distance matrix from file.
         file = open(filename)
@@ -65,20 +68,24 @@ class r0620003:
                 parent_two: TravelingSalesPersonIndividual = k_tournament(population, k)
 
                 # Produce new offspring
-                offspring_route1,offspring_route2 = DPX(problem, parent_one, parent_two)
-                offspring_route1, cost_offspring1 = opt_3_local_search(problem, offspring_route1, max_iterations=50)
-                offspring_route2, cost_offspring2 = opt_3_local_search(problem, offspring_route2, max_iterations=50)
-                offspring1 = TravelingSalesPersonIndividual()
-                offspring2 = TravelingSalesPersonIndividual()
-                offspring1.set_order(offspring_route1)
-                offspring2.set_order(offspring_route2)
-                offspring1.set_cost(offspring_route1)
-                offspring2.set_cost(offspring_route2)
-                offsprings.append(offspring1)
-                offsprings.append(offspring2)
+                offspring = DPX(distanceMatrix,parent_one,parent_two)
+                offsprings.append(offspring)
+                # offspring_route1,offspring_cost1,offspring_edges1,offspring_route2,offspring_cost2,offspring_edges2 = DPX(problem, parent_one, parent_two)
+                # offspring_route1, cost_offspring1 = opt_3_local_search(problem, offspring_route1, max_iterations=50)
+                # offspring_route2, cost_offspring2 = opt_3_local_search(problem, offspring_route2, max_iterations=50)
+                # offspring1 = TravelingSalesPersonIndividual()
+                # offspring2 = TravelingSalesPersonIndividual()
+                # offspring1.set_order(offspring_route1)
+                # offspring2.set_order(offspring_route2)
+                # offspring1.set_cost(offspring_route1)
+                # offspring2.set_cost(offspring_route2)
+                # offspring1.set_edges(offspring_edges1)
+                # offspring2.set_edges(offspring_edges2)
+                # offsprings.append(offspring1)
+                # offsprings.append(offspring2)
 
             population += offsprings
-            population = [Greedy_Mutation(problem,indi) for indi in population]
+            # population = [Greedy_Mutation(problem,indi) for indi in population]
 
             population = elimination(population, initial_population_size)
 
@@ -122,71 +129,13 @@ class r0620003:
         return bestScore_current
 
 
-
-
-
-
-
-
-            # for i in range(0, len(population), 1):
-            #     ind = population[i]
-            #     copy_ind: TravelingSalesPersonIndividual = deepcopy(ind)
-            #     copy_ind_order = copy_ind.get_order()
-            #     index = randint(0, amount_of_cities_to_visit - 1)
-            #     index_next = 0
-            #     index_prev = amount_of_cities_to_visit - 1
-            #     if (index + 1) < amount_of_cities_to_visit:
-            #         index_next = index + 1
-            #     if index > 0:
-            #         index_prev = index - 1
-            #
-            #     c_next = copy_ind_order[index_next]
-            #     c_prev = copy_ind_order[index_prev]
-            #     c = copy_ind_order[index]
-            #     c_accent: int = 0
-            #
-            #     while True:
-            #
-            #         if random() <= p:
-            #             index_l = randint(0, len(copy_ind_order) - 1)
-            #             while copy_ind_order[index_l] == c:
-            #                 index_l = randint(0, len(copy_ind_order) - 1)
-            #             c_accent = copy_ind_order[index_l]
-            #
-            #         else:
-            #             selected_indiv = choice(population).get_order()
-            #             index1 = selected_indiv.index(c) + 1
-            #             if index1 >= amount_of_cities_to_visit:
-            #                 index1 = 0
-            #             c_accent = selected_indiv[index1]
-            #
-            #         if c_accent == c_next or c_accent == c_prev:
-            #             break
-            #
-            #         # print("This is copy_ind_order before: %s." % copy_ind_order)
-            #         inversion(copy_ind_order, c, c_accent)  # order will be changed
-            #         # print("This is copy_ind_order after: %s." % copy_ind_order)
-            #         c = c_accent
-            #
-            #     if problem.calculate_individual_score(copy_ind) <= problem.calculate_individual_score(ind):
-            #         population[i] = copy_ind
-            #
-            # sorted_list_of_individuals = sorted(population,
-            #                                     key=lambda individual: problem.calculate_individual_score(individual))
-            # bestIndividual: list = sorted_list_of_individuals[0].get_order()
-            # scores = [problem.calculate_individual_score(indiv) for indiv in sorted_list_of_individuals]
-
-
-
-
 def run(args):
-    (initial_population_size, p, termination_value) = args
+    (initial_population_size, k, mutation_rate, termination_value) = args
     instance = r0620003()
     print("Running...")
-    result = instance.optimize("tour29.csv", initial_population_size=initial_population_size, p=p,
-                               termination_value=termination_value)
+    result = instance.optimize("tour29.csv", initial_population_size=initial_population_size, k = k,mutation_rate = mutation_rate, termination_value=termination_value)
     print("Finished")
     return result
 
 
-run((200, 0.02, 100))
+run((100, 1, 0.02, 100))
