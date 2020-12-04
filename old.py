@@ -3,7 +3,7 @@ from representation import TravelingSalesPersonProblem
 from random import randint
 from copy import deepcopy
 
-def opt_3_local_search(problem: TravelingSalesPersonProblem, route:list, cost_route:float, max_iterations:int = 1000):
+def opt_3_local_search(problem: TravelingSalesPersonProblem, route:list, max_iterations:int = 1000):
     """
     3 OPT Local search
     route: list of cities
@@ -15,7 +15,7 @@ def opt_3_local_search(problem: TravelingSalesPersonProblem, route:list, cost_ro
     amount_of_cities = len(route)
     iteration = 1
     tried_combinations = []
-    # distance: float = 0
+    distance: float = 0
 
     # Don't check possibilities --> assume that not possible to check them all
     # possibilities = 0
@@ -53,8 +53,8 @@ def opt_3_local_search(problem: TravelingSalesPersonProblem, route:list, cost_ro
         # for item in all_combinations:
             # item contains three indices: index1,index2,index3
 
-        route,cost_route,swap,improvement = generate_combinations(problem, route, cost_route, item)
-        # print("The remaining distance: %s\tAmount of improvement: %s." % (cost_route,improvement))
+        route,distance,swap,improvement = generate_combinations(problem, route, item)
+        print("The remaining distance: %s\tAmount of improvement: %s." % (distance,improvement))
 
         if swap:
             tried_combinations = []
@@ -65,9 +65,9 @@ def opt_3_local_search(problem: TravelingSalesPersonProblem, route:list, cost_ro
 
         iteration += 1
 
-    return route, cost_route
+    return route, distance
 
-def generate_combinations(problem: TravelingSalesPersonProblem,route,cost_route, item):
+def generate_combinations(problem: TravelingSalesPersonProblem,route,item):
 
     es1,es2,es3 = item
     ee1,ee2,ee3 = es1 +1, es2 + 1, es3 + 1
@@ -97,11 +97,11 @@ def generate_combinations(problem: TravelingSalesPersonProblem,route,cost_route,
     combo7_temp2 = swapPositions(combo7_temp1, es2, ee2)
     combo7 = swapPositions(combo7_temp2, es3, ee3)
 
+    initial_cost = cost(problem, route)
     min_cand = route
     improvement = 0
     swap = True
     kind = 1
-
     for cand in [combo1, combo2, combo3, combo4, combo5, combo6, combo7]:
 
         min_cand,improvement = cost_effect(problem,route,cand,indices_start,kind,min_cand,improvement)
@@ -110,10 +110,9 @@ def generate_combinations(problem: TravelingSalesPersonProblem,route,cost_route,
     if improvement == 0:
         swap = False
 
+    min_cost = initial_cost - improvement
 
-    min_cost = cost_route - improvement
-
-    return min_cand,min_cost, swap,improvement
+    return min_cand,min_cost,swap,improvement
 
 def cost_effect(problem,route,cand,indices_start,kind,min_cand,improvement):
 
@@ -249,15 +248,15 @@ def cost_effect(problem,route,cand,indices_start,kind,min_cand,improvement):
         return min_cand,improvement
 
 
-# def cost(problem: TravelingSalesPersonProblem,order:list):
-#     visited_edges = [(order[i], order[i + 1]) for i in range(0, len(order) - 1)]
-#     visited_edges += [(order[len(order) - 1], order[0])]
-#
-#     path_weight = 0
-#     for (a,b) in visited_edges:
-#         path_weight += problem.get_weight(a,b)
-#
-#     return path_weight
+def cost(problem: TravelingSalesPersonProblem,order:list):
+    visited_edges = [(order[i], order[i + 1]) for i in range(0, len(order) - 1)]
+    visited_edges += [(order[len(order) - 1], order[0])]
+
+    path_weight = 0
+    for (a,b) in visited_edges:
+        path_weight += problem.get_weight(a,b)
+
+    return path_weight
 
 
 def swapPositions(list_input:list, pos1, pos2):
@@ -267,21 +266,20 @@ def swapPositions(list_input:list, pos1, pos2):
 
 
 
-# def run(filename = "tour929.csv"):
-#     import numpy as np
-#     from random import shuffle
-#     try_list = list(range(929))
-#     shuffle(try_list)
-#     file = open(filename)
-#     distanceMatrix = np.loadtxt(file, delimiter=",")
-#     file.close()
-#     problem: TravelingSalesPersonProblem = TravelingSalesPersonProblem(distanceMatrix)
-#     print("Running...")
-#     calc_cost = cost(problem,try_list)
-#     result,cost_out = opt_3_local_search(problem,try_list,calc_cost,100)
-#
-#     print("Finished")
-#     return result
-#
-#
-# run()
+def run(filename = "tour929.csv"):
+    import numpy as np
+    from random import shuffle
+    try_list = list(range(929))
+    shuffle(try_list)
+    file = open(filename)
+    distanceMatrix = np.loadtxt(file, delimiter=",")
+    file.close()
+    problem: TravelingSalesPersonProblem = TravelingSalesPersonProblem(distanceMatrix)
+    print("Running...")
+    result,cost_out = opt_3_local_search(problem,try_list,100)
+
+    print("Finished")
+    return result
+
+
+run()

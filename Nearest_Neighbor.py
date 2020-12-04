@@ -17,14 +17,14 @@ def Nearest_Neighbor(amount_of_cities_to_visit, cost_matrix_original):
         costs[NN_route] = np.inf # operation on the elements changes the original
         next_city = np.argmin(costs)
         NN_cost += costs[next_city]
-        NN_edges.append((current_city,next_city))
+        # NN_edges.append((current_city,next_city))
         NN_route.append(next_city)
         current_city = next_city
 
     NN_cost += cost_matrix_original[current_city][random_city]
-    NN_edges.append((current_city,random_city))
+    # NN_edges.append((current_city,random_city))
 
-    return NN_route,NN_cost,NN_edges
+    return NN_route,NN_cost
 
 
 
@@ -54,13 +54,17 @@ def Nearest_Neighbor(amount_of_cities_to_visit, cost_matrix_original):
 #     all_costs = []
 #     print("Running...")
 #     for i in range(100):
-#         candidate,NN_cost,NN_edge = Nearest_Neighbor(len(try_list),distanceMatrix)
-#         # candidate,costss = opt_3_local_search(problem, candidate, max_iterations = 50)
-#         # all_costs.append(costss)
-#         # print("Candidate: %s ; NN_cost: %s ; NN_edge: %s ;" % (candidate,NN_cost,NN_edge))
+#         candidate,NN_cost = Nearest_Neighbor(len(try_list),distanceMatrix)
+#         candidate,costss = opt_3_local_search(problem, candidate,NN_cost, max_iterations = 15)
+#         all_costs.append(costss)
+#         # all_costs.append(NN_cost)
+#         print("Candidate: %s ; NN_cost: %s ;" % (candidate,costss))
+#         # print("Candidate: %s ; NN_cost: %s ;" % (candidate, NN_cost))
+#         # print(len(candidate))
+#         # print(len(set(candidate)))
 #
-#     # print("The mean cost is: %s." % (sum(all_costs)/len(all_costs)))
-#     #     print(len(candidate))
+#     print("The mean cost is: %s." % (sum(all_costs)/len(all_costs)))
+#
 #
 #     print("Finished")
 #
