@@ -21,18 +21,35 @@ class r0620003:
     @staticmethod
     def initialize_population(problem:TravelingSalesPersonProblem, amount_of_cities_to_visit: int, initial_population_size: int) -> list:
         population: list = list()
-
-        for _ in range(initial_population_size):
+        random_order: list = [i for i in range(1, amount_of_cities_to_visit)]
+        for c in range(initial_population_size):
 
             indiv: TravelingSalesPersonIndividual = TravelingSalesPersonIndividual()
-            candidate,cost_candidate = Nearest_Neighbor(amount_of_cities_to_visit, problem.weights)
-            # candidate,cost_candidate = opt_3_local_search(problem, candidate,cost_candidate, max_iterations = 50) # how long have to search is a trade off between cost and profit
-            indiv.set_order(candidate)
-            indiv.set_cost(cost_candidate)
-            # indiv.set_edges(edges_candidate)
-            population.append(indiv)
+            if c < int(initial_population_size / 2):
+                candidate,cost_candidate = Nearest_Neighbor(amount_of_cities_to_visit, problem.weights)
+                # candidate,cost_candidate = opt_3_local_search(problem, candidate,cost_candidate, max_iterations = 50) # how long have to search is a trade off between cost and profit
+                indiv.set_order(candidate)
+                indiv.set_cost(cost_candidate)
+                # indiv.set_edges(edges_candidate)
+                population.append(indiv)
+
+            else:
+                shuffle(random_order)
+                order_for_indiv: list = deepcopy(random_order)
+                order_for_indiv.insert(0, 0)
+                indiv.set_order(order_for_indiv)
+                cost_for_indiv = problem.calculate_individual_score(indiv)
+                candidate,cost_candidate = opt_3_local_search(problem, order_for_indiv,cost_for_indiv, max_iterations = 10) # how long have to search is a trade off between cost and profit
+                indiv.set_order(candidate)
+                indiv.set_cost(cost_candidate)
+                population.append(indiv)
+
         sorted_population = sorted(population, key=lambda individual: individual.get_cost())
         print('after NN best score: %s'% sorted_population[0].get_cost())
+        orders = [x.get_order() for x in sorted_population]
+        scores = [x.get_cost() for x in sorted_population]
+        print(scores)
+        print(orders)
 
         return population
 
