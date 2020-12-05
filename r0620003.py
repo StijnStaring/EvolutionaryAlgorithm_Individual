@@ -4,27 +4,63 @@ from copy import deepcopy
 from random import shuffle,random,randint,choice
 from representation import TravelingSalesPersonIndividual, TravelingSalesPersonProblem
 from inversion import inversion # should be in the same file when submit
+from Nearest_Neighbor import Nearest_Neighbor
 
 class r0620003:
 
 	def __init__(self):
 		self.reporter = Reporter.Reporter(self.__class__.__name__)
 
+	# @staticmethod
+	# def initialize_population(amount_of_cities_to_visit: int, initial_population_size: int) -> list:
+	# 	return_value: list = list()
+	# 	random_order: list = [i for i in range(1, amount_of_cities_to_visit)]
+	#
+	# 	for _ in range(initial_population_size):
+	# 		shuffle(random_order)
+	# 		indiv: TravelingSalesPersonIndividual = TravelingSalesPersonIndividual()
+	#
+	# 		order_for_indiv: list = deepcopy(random_order)
+	# 		order_for_indiv.insert(0, 0)
+	# 		indiv.set_order(order_for_indiv)
+	# 		return_value.append(indiv)
+	#
+	# 	return return_value
+
 	@staticmethod
-	def initialize_population(amount_of_cities_to_visit: int, initial_population_size: int) -> list:
-		return_value: list = list()
+	def initialize_population(problem: TravelingSalesPersonProblem, amount_of_cities_to_visit: int,initial_population_size: int) -> list:
+		population: list = list()
 		random_order: list = [i for i in range(1, amount_of_cities_to_visit)]
-		
-		for _ in range(initial_population_size):
-			shuffle(random_order)
+		for c in range(initial_population_size):
+
 			indiv: TravelingSalesPersonIndividual = TravelingSalesPersonIndividual()
+			if c < int(initial_population_size):
+				candidate, cost_candidate = Nearest_Neighbor(amount_of_cities_to_visit, problem.weights)
+				# candidate,cost_candidate = opt_3_local_search(problem, candidate,cost_candidate, max_iterations = 50) # how long have to search is a trade off between cost and profit
+				indiv.set_order(candidate)
+				indiv.set_cost(cost_candidate)
+				# indiv.set_edges(edges_candidate)
+				population.append(indiv)
 
-			order_for_indiv: list = deepcopy(random_order)
-			order_for_indiv.insert(0, 0)
-			indiv.set_order(order_for_indiv)
-			return_value.append(indiv)
+			else:
+				shuffle(random_order)
+				order_for_indiv: list = deepcopy(random_order)
+				order_for_indiv.insert(0, 0)
+				indiv.set_order(order_for_indiv)
+				cost_for_indiv = problem.calculate_individual_score(indiv)
+				# candidate, cost_candidate = opt_3_local_search(problem, order_for_indiv, cost_for_indiv,max_iterations=10)  # how long have to search is a trade off between cost and profit
+				# indiv.set_order(candidate)
+				indiv.set_cost(cost_for_indiv)
+				population.append(indiv)
 
-		return return_value
+		# sorted_population = sorted(population, key=lambda individual: individual.get_cost())
+		# print('after NN best score: %s' % sorted_population[0].get_cost())
+		# orders = [x.get_order() for x in sorted_population]
+		# scores = [x.get_cost() for x in sorted_population]
+		# print(scores)
+		# print(orders)
+
+		return population
 
 	# The evolutionary algorithm's main loop
 	def optimize(self, filename, initial_population_size: int = 100, p: float = 0.02, termination_value: float =  10):
@@ -35,8 +71,10 @@ class r0620003:
 
 		file.close()
 		amount_of_cities_to_visit = len(distanceMatrix)
-		population: list = self.initialize_population(amount_of_cities_to_visit, initial_population_size)
+
 		problem: TravelingSalesPersonProblem = TravelingSalesPersonProblem(distanceMatrix)
+		population: list = self.initialize_population(problem,amount_of_cities_to_visit, initial_population_size)
+
 
 		# StopingCriteria
 		history_mean_objectives: list = []
@@ -137,13 +175,13 @@ def run(args):
 	(initial_population_size, p, termination_value) = args
 	instance = r0620003()
 	print("Running...")
-	result = instance.optimize("tour29.csv", initial_population_size=initial_population_size, p = p, termination_value = termination_value)
+	result = instance.optimize("tour929.csv", initial_population_size=initial_population_size, p = p, termination_value = termination_value)
 	print("Finished")
 	return result
 
 
 
-run((200,0.02,100))
+run((200,0.02,10000))
 
 
 
