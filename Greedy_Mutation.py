@@ -3,18 +3,30 @@ from representation import TravelingSalesPersonIndividual
 from copy import deepcopy
 from random import randint,choice
 
-def DPX(cost_matrix_original, parent_one:TravelingSalesPersonIndividual, parent_two:TravelingSalesPersonIndividual):
+def Greedy_Mutation(cost_matrix_original, parent_one:TravelingSalesPersonIndividual):
     order1 = parent_one.get_order()
-    order2 = parent_two.get_order()
+    amount_of_cities_to_visit = len(cost_matrix_original)
 
     visited_edges1 = [(order1[i], order1[i + 1]) for i in range(0, len(order1) - 1)]
     visited_edges1 += [(order1[len(order1) - 1], order1[0])]
 
-    visited_edges2 = [(order2[i], order2[i + 1]) for i in range(0, len(order2) - 1)]
-    visited_edges2 += [(order2[len(order2) - 1], order2[0])]
+    # Number between 4 and 7.
+    number = randint(4, 7)
+    order = parent_one.get_order()
+    visited_edges = [(order[i], order[i + 1]) for i in range(0, len(order) - 1)]
+    visited_edges += [(order[len(order) - 1], order[0])]
+    used_indices = []
 
-#     Look for the edges in common.
-    inters = list(set(visited_edges1).intersection(set(visited_edges2)))
+    remove_edge_index = randint(0, amount_of_cities_to_visit - 1)
+    for n in range(number):
+        while remove_edge_index in used_indices:
+            remove_edge_index = randint(0, amount_of_cities_to_visit - 1)
+        used_indices.append(remove_edge_index)
+
+    print("used indices for mutation: %s" % used_indices)
+
+    inters = [e for i, e in enumerate(visited_edges) if i not in used_indices]
+
     amount_of_cities_to_visit = len(cost_matrix_original)
 
     if len(inters) == amount_of_cities_to_visit:
@@ -56,8 +68,13 @@ def DPX(cost_matrix_original, parent_one:TravelingSalesPersonIndividual, parent_
 
         costs = cost_matrix[current_city]
 
+
         if len(y) != 0:
             next_city = y[0][1]
+            print(inters)
+            print(y[0])
+
+
             NN_cost += costs[next_city]
             # NN_edges.append((current_city,next_city))
             NN_route.append(next_city)
@@ -109,23 +126,23 @@ def fun(current_city,list_edges):
 #     count = 1
 #     for _ in range(3000):
 #         try_list1 = list(range(29))
-#         try_list2 = list(range(29))
+#
 #         shuffle(try_list1)
-#         shuffle(try_list2)
+#         print("the original list: %s" % try_list1)
+#
 #
 #
 #         parent_one = TravelingSalesPersonIndividual()
-#         parent_two = TravelingSalesPersonIndividual()
 #         parent_one.set_order(try_list1)
-#         parent_two.set_order(try_list2)
+#
 #
 #         print("Running...")
-#         offspring,inters,NN_cost = DPX(distanceMatrix,parent_one,parent_two)
+#         offspring,inters,NN_cost = Greedy_Mutation(distanceMatrix,parent_one)
 #         oo = offspring.get_order()
 #         print("inters: %s" % inters)
-#         for i in range(len(inters)):
-#             ind = oo.index(inters[i][0])
-#             print("value: %s and value %s " % (oo[ind],oo[ind+1]))
+#         # for i in range(len(inters)):
+#         #     ind = oo.index(inters[i][0])
+#         #     # print("value: %s and value %s " % (oo[ind],oo[ind+1]))
 #         b = []
 #         for i in oo:
 #             a = []
@@ -144,7 +161,7 @@ def fun(current_city,list_edges):
 #
 #         print("city missing in oo: %s" % m)
 #
-#         print(oo)
+#         print("after mutation: %s"% oo)
 #         print(len(oo))
 #         print(len(set(oo)))
 #         if len(set(oo)) != 29:
@@ -157,4 +174,4 @@ def fun(current_city,list_edges):
 #
 #
 # run()
-
+#

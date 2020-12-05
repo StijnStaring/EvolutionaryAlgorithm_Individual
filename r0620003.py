@@ -8,6 +8,8 @@ from Nearest_Neighbor import Nearest_Neighbor
 from three_opt import *
 from elimination import elimination
 from DPX import DPX
+from collections import deque
+from Greedy_Mutation import Greedy_Mutation
 from SCX import SCX
 # from DPX import DPX
 # from inversion import inversion  # should be in the same file when submit
@@ -22,16 +24,37 @@ class r0620003:
     def initialize_population(problem:TravelingSalesPersonProblem, amount_of_cities_to_visit: int, initial_population_size: int) -> list:
         population: list = list()
         random_order: list = [i for i in range(1, amount_of_cities_to_visit)]
+        random_numbers_to_start = deepcopy(random_order)
         for c in range(initial_population_size):
 
             indiv: TravelingSalesPersonIndividual = TravelingSalesPersonIndividual()
-            if c < int(initial_population_size / 2):
-                candidate,cost_candidate = Nearest_Neighbor(amount_of_cities_to_visit, problem.weights)
+
+            if c < int(initial_population_size / 2) and len(random_numbers_to_start) != 0:
+                random_city = choice(random_numbers_to_start)
+                random_numbers_to_start.remove(random_city)
+                candidate,cost_candidate = Nearest_Neighbor(amount_of_cities_to_visit, problem.weights,random_city)
                 # candidate,cost_candidate = opt_3_local_search(problem, candidate,cost_candidate, max_iterations = 50) # how long have to search is a trade off between cost and profit
-                indiv.set_order(candidate)
-                indiv.set_cost(cost_candidate)
-                # indiv.set_edges(edges_candidate)
-                population.append(indiv)
+                index_first_city = candidate.index(0)
+                amount_to_move = amount_of_cities_to_visit - index_first_city
+                items = deque(candidate)
+                items.rotate(amount_to_move)
+
+                if list(items) not in population:
+                    indiv.set_order(list(items))
+                    indiv.set_cost(cost_candidate)
+                    # indiv.set_edges(edges_candidate)
+                    population.append(indiv)
+
+                else:
+                    shuffle(random_order)
+                    order_for_indiv: list = deepcopy(random_order)
+                    order_for_indiv.insert(0, 0)
+                    indiv.set_order(order_for_indiv)
+                    cost_for_indiv = problem.calculate_individual_score(indiv)
+                    # candidate,cost_candidate = opt_3_local_search(problem, order_for_indiv,cost_for_indiv, max_iterations = 10) # how long have to search is a trade off between cost and profit
+                    # indiv.set_order(candidate)
+                    indiv.set_cost(cost_for_indiv)
+                    population.append(indiv)
 
             else:
                 shuffle(random_order)
@@ -39,9 +62,9 @@ class r0620003:
                 order_for_indiv.insert(0, 0)
                 indiv.set_order(order_for_indiv)
                 cost_for_indiv = problem.calculate_individual_score(indiv)
-                candidate,cost_candidate = opt_3_local_search(problem, order_for_indiv,cost_for_indiv, max_iterations = 10) # how long have to search is a trade off between cost and profit
-                indiv.set_order(candidate)
-                indiv.set_cost(cost_candidate)
+                # candidate,cost_candidate = opt_3_local_search(problem, order_for_indiv,cost_for_indiv, max_iterations = 10) # how long have to search is a trade off between cost and profit
+                # indiv.set_order(candidate)
+                indiv.set_cost(cost_for_indiv)
                 population.append(indiv)
 
         sorted_population = sorted(population, key=lambda individual: individual.get_cost())
@@ -74,11 +97,12 @@ class r0620003:
         bestScore_current = 0
 
         iteration = 1
-        bestScore_individual: TravelingSalesPersonIndividual
+        bestScore_individual = TravelingSalesPersonIndividual()
 
         while count < termination_value:
+            k = get_the_k_value(iteration)
             if iteration > 1:
-                population.insert(0,bestScore_individual)
+                population.insert(0,bestScore_individual) # elitism --> insert the best individual
 
             offsprings: list = list()
             for _ in range(initial_population_size):
@@ -89,31 +113,15 @@ class r0620003:
 
                 # Produce new offspring
                 offspring = DPX(distanceMatrix,parent_one,parent_two)
-                # print(offspring.get_order())
-                # o = offspring.get_order()
-                # if len(set(o)) != 29:
-                #     raise Exception("error1")
-                # oc = offspring.get_cost()
-                # if oc == np.inf or oc <27000:
-                #     raise Exception("error2")
+                offsprings.append(offspring)
 
-                # offsprings.append(offspring)
+            population += offsprings
+            population = [Greedy_Mutation(distanceMatrix, individual) for individual in population]
+            k_elim = 3
+            population = shared_fitness_k_tournament_elimination(problem, population, initial_population_size,k_elim)
 
-                # offspring_route1,offspring_cost1,offspring_edges1,offspring_route2,offspring_cost2,offspring_edges2 = DPX(problem, parent_one, parent_two)
-                # offspring_route1, cost_offspring1 = opt_3_local_search(problem, offspring_route1, max_iterations=50)
-                # offspring_route2, cost_offspring2 = opt_3_local_search(problem, offspring_route2, max_iterations=50)
-                # offspring1 = TravelingSalesPersonIndividual()
-                # offspring2 = TravelingSalesPersonIndividual()
-                # offspring1.set_order(offspring_route1)
-                # offspring2.set_order(offspring_route2)
-                # offspring1.set_cost(offspring_route1)
-                # offspring2.set_cost(offspring_route2)
-                # offspring1.set_edges(offspring_edges1)
-                # offspring2.set_edges(offspring_edges2)
-                # offsprings.append(offspring1)
-                # offsprings.append(offspring2)
-                # print(offspring.get_cost())
-                population[randint(0,amount_of_cities_to_visit - 1)] = offspring
+
+                # population[randint(0,amount_of_cities_to_visit - 1)] = offspring
             #     not good elimination!!! 
 
             # population = offsprings
@@ -161,6 +169,20 @@ class r0620003:
                 break
 
         return bestScore_current
+
+def get_the_k_value(iteration:int) -> int:
+    if iteration > 10:
+        return 1
+    elif iteration > 30:
+        return 2
+    elif iteration > 60:
+        return 3
+    elif iteration > 90:
+        return 4
+    elif iteration > 120:
+        return 5
+    else:
+        raise Exception("Should have been excepted by the previous cases. ")
 
 
 def run(args):

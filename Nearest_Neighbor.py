@@ -4,12 +4,12 @@ import numpy as np
 from copy import deepcopy
 from three_opt import opt_3_local_search
 
-def Nearest_Neighbor(amount_of_cities_to_visit, cost_matrix_original):
+def Nearest_Neighbor(amount_of_cities_to_visit, cost_matrix_original,random_city):
     cost_matrix = deepcopy(cost_matrix_original)
-    NN_route = []
+
     # NN_edges = []
-    random_city = randint(0,amount_of_cities_to_visit - 1)
-    NN_route.append(random_city)
+    # random_city = randint(0,amount_of_cities_to_visit - 1)
+    NN_route = [random_city]
     current_city = random_city
     NN_cost = 0
     while len(NN_route) != amount_of_cities_to_visit:
