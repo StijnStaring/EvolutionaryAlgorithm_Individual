@@ -8,6 +8,7 @@ def Opt_3(route_original:list,initial_cost:float,distanceMatrix,amount_cities):
 
     for i in range(amount_cities):
 
+
         """ Initialization of the current/next/previous cities """
         current_city = route[i]
         next_city:int
@@ -41,6 +42,7 @@ def Opt_3(route_original:list,initial_cost:float,distanceMatrix,amount_cities):
         memory_cities1 = []
 
         candidates = [(c,co) for (c,co) in list(enumerate(costs1)) if co < current1 and c != previous_city and c != current_city]
+        # print(candidates)
         sorted_candidates_start = sorted(candidates, key=lambda x: x[1])
 
         for (c,co) in sorted_candidates_start:
@@ -58,7 +60,7 @@ def Opt_3(route_original:list,initial_cost:float,distanceMatrix,amount_cities):
             costs_c = deepcopy(distanceMatrix[c])
             costs1_relative = current1 + costs_c[city_D] - costs1[c]
 
-            if previous_city_i > c_index:
+            if previous_city_i >= c_index:
                 not_desired_cities = [city_F,current_city, previous_city, next_city] + route[c_index:previous_city_i]
             else:
                 not_desired_cities = [city_F,current_city, previous_city, next_city] + route[c_index:] + route[:previous_city_i]
@@ -82,7 +84,7 @@ def Opt_3(route_original:list,initial_cost:float,distanceMatrix,amount_cities):
                 cost_reversed = 0
 
                 insert_part: list
-                if city_D_i > city_end_next_i:
+                if city_D_i >= city_end_next_i:
                     insert_part = route[city_end_next_i:city_D_i]
                 else:
                     insert_part = route[city_end_next_i:] + route[:city_D_i]
@@ -96,9 +98,8 @@ def Opt_3(route_original:list,initial_cost:float,distanceMatrix,amount_cities):
                 for (a, b) in visited_edges:
                     cost_reversed += distanceMatrix[a, b]
 
-                improvement1 = costs1_relative + distanceMatrix[city_end][city_end_next] \
-                    - distanceMatrix[city_end_next][next_city]  - distanceMatrix[city_end][city_D] + cost_original - cost_reversed
-                memory_cities1 = [city_end_next_i, city_D_i]
+                improvement1 = costs1_relative + distanceMatrix[city_end][city_end_next] - distanceMatrix[city_end_next][next_city]  - distanceMatrix[city_end][city_D] + cost_original - cost_reversed
+                memory_cities1 = [city_end_next_i, city_D_i,c,city_end]
                 if improvement1 > 0:
                     break
             if improvement1 > 0:
@@ -134,7 +135,7 @@ def Opt_3(route_original:list,initial_cost:float,distanceMatrix,amount_cities):
             costs_c = deepcopy(distanceMatrix[:,c]) # cost to travel to c
             costs1_relative = current1 + distanceMatrix[c,city_D] - distanceMatrix[c][current_city]
 
-            if previous_city_i > c_index:
+            if previous_city_i >= c_index:
                 not_desired_cities = [city_F, current_city, previous_city, next_city] + route[c_index:previous_city_i]
             else:
                 not_desired_cities = [city_F,current_city, previous_city, next_city] + route[c_index:] + route[:previous_city_i]
@@ -162,14 +163,16 @@ def Opt_3(route_original:list,initial_cost:float,distanceMatrix,amount_cities):
                 break
 
         """ Swapping best suggestion """
-        if improvement1 >= improvement2 and improvement1 != 0:
+        if improvement1 >= improvement2 and improvement1 > 0:
             initial_cost -= improvement1
 
             city_end_next_i = memory_cities1[0]
             city_D_i = memory_cities1[1]
+            c = memory_cities1[2]
+            city_end = memory_cities1[3]
 
             insert_part:list
-            if city_D_i > city_end_next_i:
+            if city_D_i >= city_end_next_i:
                 insert_part = route[city_end_next_i:city_D_i]
                 insert_part.reverse()
 
@@ -177,37 +180,36 @@ def Opt_3(route_original:list,initial_cost:float,distanceMatrix,amount_cities):
                 insert_part = route[city_end_next_i:] + route[:city_D_i]
                 insert_part.reverse()
 
-            if city_end_next_i>next_city_i:
+            if city_end_next_i>=next_city_i:
                 part1 = route[next_city_i:city_end_next_i]
             else:
                 part1 = route[next_city_i:] + route[:city_end_next_i]
 
-            if previous_city_i >city_D_i:
+            if previous_city_i >= city_D_i:
                 part2 = route[city_D_i:previous_city_i+1]
             else:
                 part2 = route[city_D_i:] + route[:previous_city_i+1]
 
             route = [current_city] + insert_part + part1 + part2
 
-        elif improvement1 < improvement2:
+        elif improvement1 < improvement2 and improvement2 > 0:
             initial_cost -= improvement2
-
             city_end_next_i = memory_cities2[0]
             city_D_i = memory_cities2[1]
 
             insert_part: list
-            if city_D_i > city_end_next_i:
+            if city_D_i >= city_end_next_i:
                 insert_part = route[city_end_next_i:city_D_i]
 
             else:
                 insert_part = route[city_end_next_i:] + route[:city_D_i]
 
-            if city_end_next_i > next_city_i:
+            if city_end_next_i >= next_city_i:
                 part1 = route[next_city_i:city_end_next_i]
             else:
                 part1 = route[next_city_i:] + route[:city_end_next_i]
 
-            if previous_city_i > city_D_i:
+            if previous_city_i >= city_D_i:
                 part2 = route[city_D_i:previous_city_i+1]
             else:
                 part2 = route[city_D_i:] + route[:previous_city_i+1]
@@ -216,12 +218,24 @@ def Opt_3(route_original:list,initial_cost:float,distanceMatrix,amount_cities):
 
 
 
-    return route
+    return route,initial_cost
 
-def run(filename = "tour929.csv"):
+def cost(problem: TravelingSalesPersonProblem,order:list):
+    visited_edges = [(order[i], order[i + 1]) for i in range(0, len(order) - 1)]
+    visited_edges += [(order[len(order) - 1], order[0])]
+
+    path_weight = 0
+    for (a,b) in visited_edges:
+        path_weight += problem.get_weight(a,b)
+
+    return path_weight
+
+
+def run1(filename = "tour29.csv"):
     import numpy as np
     from random import shuffle
-    try_list = list(range(929))
+    try_list = list(range(29))
+    # try_list = [16, 17, 18, 21, 22, 20, 28, 27, 25, 19, 26, 24, 23, 15, 13, 12, 11, 10, 9, 7, 3, 4, 5, 1, 0, 2, 6, 8, 14]
     shuffle(try_list)
 
     file = open(filename)
@@ -229,11 +243,18 @@ def run(filename = "tour929.csv"):
     file.close()
 
     problem = TravelingSalesPersonProblem(distanceMatrix)
+    KOST = cost(problem,try_list)
+    print("The start KOST: %s" % KOST)
 
     print("Running...")
     print("The original route: %s" % try_list)
-    new_route = Opt_3(try_list,10000,distanceMatrix,len(distanceMatrix))
+    new_route,new_cost = Opt_3(try_list,KOST,distanceMatrix,len(distanceMatrix))
     print("The new route: %s" % new_route)
+    print("the new cost: %s" % new_cost)
+    cost_check = cost(problem, new_route)
+    print("the cost check is: %s" % cost_check)
     print("Finished")
 
-run()
+run1()
+
+
