@@ -12,6 +12,7 @@ from collections import deque
 from Greedy_Mutation import Greedy_Mutation
 from diverse_k_tournament_elimination import diverse_k_tournament_elimination
 import time
+from Opt_3_Swap import Opt_3
 from SCX import SCX
 # from DPX import DPX
 # from inversion import inversion  # should be in the same file when submit
@@ -37,7 +38,7 @@ class r0620003:
                 random_city = choice(random_numbers_to_start)
                 random_numbers_to_start.remove(random_city)
                 candidate,cost_candidate = Nearest_Neighbor(amount_of_cities_to_visit, problem.weights,random_city)
-                # candidate,cost_candidate = opt_3_local_search(problem, candidate,cost_candidate, max_iterations = 50) # how long have to search is a trade off between cost and profit
+                candidate,cost_candidate = Opt_3(candidate,cost_candidate,problem.weights,amount_of_cities_to_visit) # how long have to search is a trade off between cost and profit
                 index_first_city = candidate.index(0)
                 amount_to_move = amount_of_cities_to_visit - index_first_city
                 items = deque(candidate)
@@ -55,8 +56,8 @@ class r0620003:
                     order_for_indiv.insert(0, 0)
                     indiv.set_order(order_for_indiv)
                     cost_for_indiv = problem.calculate_individual_score(indiv)
-                    # candidate,cost_candidate = opt_3_local_search(problem, order_for_indiv,cost_for_indiv, max_iterations = 10) # how long have to search is a trade off between cost and profit
-                    # indiv.set_order(candidate)
+                    order_for_indiv, cost_for_indiv = Opt_3(order_for_indiv, cost_for_indiv, problem.weights, amount_of_cities_to_visit)
+                    indiv.set_order(order_for_indiv)
                     indiv.set_cost(cost_for_indiv)
                     population.append(indiv)
 
@@ -66,8 +67,8 @@ class r0620003:
                 order_for_indiv.insert(0, 0)
                 indiv.set_order(order_for_indiv)
                 cost_for_indiv = problem.calculate_individual_score(indiv)
-                # candidate,cost_candidate = opt_3_local_search(problem, order_for_indiv,cost_for_indiv, max_iterations = 10) # how long have to search is a trade off between cost and profit
-                # indiv.set_order(candidate)
+                order_for_indiv, cost_for_indiv = Opt_3(order_for_indiv, cost_for_indiv, problem.weights,amount_of_cities_to_visit)
+                indiv.set_order(order_for_indiv)
                 indiv.set_cost(cost_for_indiv)
                 population.append(indiv)
 
