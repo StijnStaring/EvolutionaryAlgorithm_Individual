@@ -10,6 +10,8 @@ from elimination import elimination
 from DPX import DPX
 from collections import deque
 from Greedy_Mutation import Greedy_Mutation
+from diverse_k_tournament_elimination import diverse_k_tournament_elimination
+import time
 from SCX import SCX
 # from DPX import DPX
 # from inversion import inversion  # should be in the same file when submit
@@ -22,9 +24,11 @@ class r0620003:
 
     @staticmethod
     def initialize_population(problem:TravelingSalesPersonProblem, amount_of_cities_to_visit: int, initial_population_size: int) -> list:
+        st = time.time()
         population: list = list()
         random_order: list = [i for i in range(1, amount_of_cities_to_visit)]
         random_numbers_to_start = deepcopy(random_order)
+        random_numbers_to_start.insert(0,0)
         for c in range(initial_population_size):
 
             indiv: TravelingSalesPersonIndividual = TravelingSalesPersonIndividual()
@@ -67,17 +71,20 @@ class r0620003:
                 indiv.set_cost(cost_for_indiv)
                 population.append(indiv)
 
-        sorted_population = sorted(population, key=lambda individual: individual.get_cost())
-        print('after NN best score: %s'% sorted_population[0].get_cost())
-        orders = [x.get_order() for x in sorted_population]
-        scores = [x.get_cost() for x in sorted_population]
-        print(scores)
-        print(orders)
-
+        # print("random_numbers_to_start: %s" % random_numbers_to_start)
+        # sorted_population = sorted(population, key=lambda individual: individual.get_cost())
+        # # print('after NN best score: %s'% sorted_population[0].get_cost())
+        # orders = [x.get_order() for x in sorted_population]
+        # scores = [x.get_cost() for x in sorted_population]
+        # print(scores)
+        # print(orders)
+        et = time.time()
+        time_diff = et - st
+        print("Time needed for the initialization: %s " % time_diff)
         return population
 
     # The evolutionary algorithm's main loop
-    def optimize(self, filename, initial_population_size: int = 100, k:int = 5, mutation_rate: float = 0.02, termination_value: int = 50):
+    def optimize(self, filename, initial_population_size: int = 100,k_elim: int = 3, mutation_rate: float = 0.20,recombination_rate:float = 0.7, termination_value: int = 50):
         # def optimize(self, filename, initial_population_size: int = 100, amount_of_offsprings: int = 100, k: int = 5,alpha: float = .2, recombination_rate: float = 1, result_history_length: int = 50,termination_value: float = 0.005):
         # Read distance matrix from file.
         file = open(filename)
@@ -87,7 +94,6 @@ class r0620003:
         amount_of_cities_to_visit = len(distanceMatrix)
         problem: TravelingSalesPersonProblem = TravelingSalesPersonProblem(distanceMatrix)
         population: list = self.initialize_population(problem,amount_of_cities_to_visit, initial_population_size)
-
 
         # StopingCriteria
         history_mean_objectives: list = []
@@ -105,21 +111,38 @@ class r0620003:
                 population.insert(0,bestScore_individual) # elitism --> insert the best individual
 
             offsprings: list = list()
+            t1 = time.time()
             for _ in range(initial_population_size):
             # for _ in range(int(10)):
-                # Select best candidates
-                parent_one: TravelingSalesPersonIndividual = k_tournament(population, k) # Can also try the selection with increasing exploitation --> decreasing s
-                parent_two: TravelingSalesPersonIndividual = k_tournament(population, k)
+                if random() < recombination_rate:
+                    # Select best candidates
+                    st = time.time()
+                    parent_one: TravelingSalesPersonIndividual = k_tournament(population, k) # Can also try the selection with increasing exploitation --> decreasing s
+                    parent_two: TravelingSalesPersonIndividual = k_tournament(population, k)
+                    et = time.time()
+                    time_diff = et - st
+                    print("time needed for one k-selection: %s " % time_diff)
+                    # Produce new offspring
+                    st = time.time()
+                    offspring = DPX(distanceMatrix,parent_one,parent_two)
+                    et = time.time()
+                    time_diff = et - st
+                    print("time needed for one offspring creation: %s " % time_diff)
+                    offsprings.append(offspring)
 
-                # Produce new offspring
-                offspring = DPX(distanceMatrix,parent_one,parent_two)
-                offsprings.append(offspring)
-
+            t2 = time.time()
+            print("The time needed for all the offsprings: %s"%(t2-t1))
             population += offsprings
-            population = [Greedy_Mutation(distanceMatrix, individual) for individual in population]
+            st = time.time()
+            population = [Greedy_Mutation(distanceMatrix, individual,mutation_rate) for individual in population]
+            et = time.time()
+            print("The time needed for all the mutations: %s" % (et - st))
             k_elim = 3
-            population = shared_fitness_k_tournament_elimination(problem, population, initial_population_size,k_elim)
-
+            """ The elimination forces all individuals in the population to be different solutions"""
+            st = time.time()
+            population = diverse_k_tournament_elimination(population,k_elim,initial_population_size,amount_of_cities_to_visit)
+            et = time.time()
+            print("The time needed for all the elimination: %s" % (et - st))
 
                 # population[randint(0,amount_of_cities_to_visit - 1)] = offspring
             #     not good elimination!!! 
@@ -139,7 +162,7 @@ class r0620003:
             # bestScore_individual = population[0]
             bestScore_current = bestScore_individual.get_cost()
 
-            print("%s\t %s" % (np.around(bestScore_current,4),np.around(bestScore_prev,4)))
+            # print("%s\t %s" % (np.around(bestScore_current,4),np.around(bestScore_prev,4)))
 
             if np.around(bestScore_current, 4) == np.around(bestScore_prev, 4):
                 count += 1
@@ -150,7 +173,7 @@ class r0620003:
             scores = [x.get_cost() for x in population]
             meanScore = sum(scores) / len(scores)
             history_mean_objectives.append(meanScore)
-            print("Mean objective: %s\tBest objective: %s\tBest individual %s" % (meanScore, bestScore_current, bestScore_individual))
+            print("It: %s\tMean objective: %s\tBest objective: %s\tBest individual %s" % (iteration,meanScore, bestScore_current, bestScore_individual))
             iteration += 1
 
             # Call the reporter with:
@@ -171,27 +194,27 @@ class r0620003:
         return bestScore_current
 
 def get_the_k_value(iteration:int) -> int:
-    if iteration > 10:
+    if iteration <= 20:
         return 1
-    elif iteration > 30:
+    elif iteration <= 60:
         return 2
-    elif iteration > 60:
+    elif iteration <= 150:
         return 3
-    elif iteration > 90:
+    elif iteration <= 200:
         return 4
-    elif iteration > 120:
+    elif iteration > 200:
         return 5
     else:
         raise Exception("Should have been excepted by the previous cases. ")
 
 
 def run(args):
-    (initial_population_size, k, mutation_rate, termination_value) = args
+    (initial_population_size,k_elim, mutation_rate, recombination_rate, termination_value) = args
     instance = r0620003()
     print("Running...")
-    result = instance.optimize("tour29.csv", initial_population_size=initial_population_size, k = k,mutation_rate = mutation_rate, termination_value=termination_value)
+    result = instance.optimize("tour929.csv", initial_population_size=initial_population_size,k_elim = k_elim,mutation_rate = mutation_rate,recombination_rate = recombination_rate, termination_value=termination_value)
     print("Finished")
     return result
 
 
-run((100, 5, 0.02, 100))
+run((100,3, 0.30, 1.0, 200))

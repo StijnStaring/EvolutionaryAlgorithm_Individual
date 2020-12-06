@@ -1,109 +1,114 @@
 import numpy as np
 from representation import TravelingSalesPersonIndividual
 from copy import deepcopy
-from random import randint,choice
+from random import randint,choice,random
 
-def Greedy_Mutation(cost_matrix_original, parent_one:TravelingSalesPersonIndividual):
-    order1 = parent_one.get_order()
-    amount_of_cities_to_visit = len(cost_matrix_original)
+def Greedy_Mutation(cost_matrix_original, parent_one:TravelingSalesPersonIndividual, mutation_rate:float):
+    if random() > mutation_rate:
+        return parent_one
 
-    visited_edges1 = [(order1[i], order1[i + 1]) for i in range(0, len(order1) - 1)]
-    visited_edges1 += [(order1[len(order1) - 1], order1[0])]
+    else:
 
-    # Number between 4 and 7.
-    number = randint(4, 7)
-    order = parent_one.get_order()
-    visited_edges = [(order[i], order[i + 1]) for i in range(0, len(order) - 1)]
-    visited_edges += [(order[len(order) - 1], order[0])]
-    used_indices = []
+        order1 = parent_one.get_order()
+        amount_of_cities_to_visit = len(cost_matrix_original)
 
-    remove_edge_index = randint(0, amount_of_cities_to_visit - 1)
-    for n in range(number):
-        while remove_edge_index in used_indices:
-            remove_edge_index = randint(0, amount_of_cities_to_visit - 1)
-        used_indices.append(remove_edge_index)
+        visited_edges1 = [(order1[i], order1[i + 1]) for i in range(0, len(order1) - 1)]
+        visited_edges1 += [(order1[len(order1) - 1], order1[0])]
 
-    print("used indices for mutation: %s" % used_indices)
+        # Number between 4 and 7.
+        number = randint(4, 7)
+        order = parent_one.get_order()
+        visited_edges = [(order[i], order[i + 1]) for i in range(0, len(order) - 1)]
+        visited_edges += [(order[len(order) - 1], order[0])]
+        used_indices = []
 
-    inters = [e for i, e in enumerate(visited_edges) if i not in used_indices]
+        remove_edge_index = randint(0, amount_of_cities_to_visit - 1)
+        for n in range(number):
+            while remove_edge_index in used_indices:
+                remove_edge_index = randint(0, amount_of_cities_to_visit - 1)
+            used_indices.append(remove_edge_index)
 
-    amount_of_cities_to_visit = len(cost_matrix_original)
+        # print("used indices for mutation: %s" % used_indices)
 
-    if len(inters) == amount_of_cities_to_visit:
-        offspring = TravelingSalesPersonIndividual()
-        offspring.set_order(order1)
-        cost1 = parent_one.get_cost()
-        offspring.set_cost(cost1)
-        return offspring
-#     inters = [(918, 323), (685, 606),(700,701)]
-#     print("inters is: %s " % inters)
+        inters = [e for i, e in enumerate(visited_edges) if i not in used_indices]
 
-    available_choices = [i for i in range(amount_of_cities_to_visit)]
-    for (i,j) in inters:
-        available_choices.remove(j)
-    random_city = choice(available_choices)
+        amount_of_cities_to_visit = len(cost_matrix_original)
 
-#     Build the offspring
-    cost_matrix = deepcopy(cost_matrix_original)
+        if len(inters) == amount_of_cities_to_visit:
+            offspring = TravelingSalesPersonIndividual()
+            offspring.set_order(order1)
+            cost1 = parent_one.get_cost()
+            offspring.set_cost(cost1)
+            return offspring
+    #     inters = [(918, 323), (685, 606),(700,701)]
+    #     print("inters is: %s " % inters)
 
-    NN_route = [random_city]
+        available_choices = [i for i in range(amount_of_cities_to_visit)]
+        for (i,j) in inters:
+            available_choices.remove(j)
+        random_city = choice(available_choices)
 
-    # NN_edges = []
-    # check: bool = False
-    # random_city = 0
-    # while not check:
-    #     print("random city: %s" % random_city)
-    #     print(inters)
-    #     random_city = randint(0, amount_of_cities_to_visit - 1)
-    #     if all(list(map(lambda x: x[1] != random_city,inters))):
-    #         check = True
+    #     Build the offspring
+        cost_matrix = deepcopy(cost_matrix_original)
 
-    current_city = random_city
-    NN_cost = 0
-    y = []
-    while len(NN_route) != amount_of_cities_to_visit:
-        if len(inters) != 0:
-            y = list(filter(lambda x: fun(current_city,x),inters))
+        NN_route = [random_city]
 
+        # NN_edges = []
+        # check: bool = False
+        # random_city = 0
+        # while not check:
+        #     print("random city: %s" % random_city)
+        #     print(inters)
+        #     random_city = randint(0, amount_of_cities_to_visit - 1)
+        #     if all(list(map(lambda x: x[1] != random_city,inters))):
+        #         check = True
 
-        costs = cost_matrix[current_city]
-
-
-        if len(y) != 0:
-            next_city = y[0][1]
-            print(inters)
-            print(y[0])
-
-
-            NN_cost += costs[next_city]
-            # NN_edges.append((current_city,next_city))
-            NN_route.append(next_city)
-            current_city = next_city
-
-
-        else:
+        current_city = random_city
+        NN_cost = 0
+        y = []
+        while len(NN_route) != amount_of_cities_to_visit:
             if len(inters) != 0:
-                for (c1, c2) in inters:
-                    costs[c2] = np.inf
+                y = list(filter(lambda x: fun(current_city,x),inters))
 
-            costs[NN_route] = np.inf  # operation on the elements changes the original
-            next_city = np.argmin(costs)
-            NN_cost += costs[next_city]
-            # NN_edges.append((current_city,next_city))
-            NN_route.append(next_city)
-            current_city = next_city
 
-    NN_cost += cost_matrix_original[current_city][random_city]
-    # NN_edges.append((current_city,random_city))
+            costs = cost_matrix[current_city]
 
-    offspring = TravelingSalesPersonIndividual()
-    offspring.set_order(NN_route)
-    offspring.set_cost(NN_cost)
-    if len(set(NN_route)) != amount_of_cities_to_visit:
-        raise Exception("error: in the amount of cities to visit")
 
-    # return offspring,inters,NN_cost
-    return offspring
+            if len(y) != 0:
+                next_city = y[0][1]
+                # print(inters)
+                # print(y[0])
+
+
+                NN_cost += costs[next_city]
+                # NN_edges.append((current_city,next_city))
+                NN_route.append(next_city)
+                current_city = next_city
+
+
+            else:
+                if len(inters) != 0:
+                    for (c1, c2) in inters:
+                        costs[c2] = np.inf
+
+                costs[NN_route] = np.inf  # operation on the elements changes the original
+                next_city = np.argmin(costs)
+                NN_cost += costs[next_city]
+                # NN_edges.append((current_city,next_city))
+                NN_route.append(next_city)
+                current_city = next_city
+
+        NN_cost += cost_matrix_original[current_city][random_city]
+        # NN_edges.append((current_city,random_city))
+
+        offspring = TravelingSalesPersonIndividual()
+        offspring.set_order(NN_route)
+        offspring.set_cost(NN_cost)
+        if len(set(NN_route)) != amount_of_cities_to_visit:
+            raise Exception("error: in the amount of cities to visit")
+
+        # return offspring,inters,NN_cost
+        return offspring
 
 def fun(current_city,list_edges):
 
