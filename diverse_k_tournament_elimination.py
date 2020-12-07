@@ -19,20 +19,20 @@ def diverse_k_tournament_elimination(population:list, k_elim: int, amount_of_sur
             chosen_individuals = copy_population[:k_elim]
             sorted_individuals = sorted(chosen_individuals, key=lambda individual: individual.get_cost())
             survivors.append(sorted_individuals[0])
-
-        shuffle(population)
-        chosen_individuals = list(enumerate(population[:k_elim]))
-        sorted_individuals = sorted(chosen_individuals, key=lambda individual: individual[1].get_cost())
-        candidate = sorted_individuals[0][1]
-        if candidate.get_order() in survivors_orders:
-            index_remove = sorted_individuals[0][0]
-            del population[index_remove]
-
         else:
-            survivors.append(candidate)
-            survivors_orders.append(candidate.get_order()) # not good when work with 929
-            index_remove = sorted_individuals[0][0]
-            del population[index_remove]
+            shuffle(population)
+            chosen_individuals = list(enumerate(population[:k_elim]))
+            sorted_individuals = sorted(chosen_individuals, key=lambda individual: individual[1].get_cost())
+            candidate = sorted_individuals[0][1]
+            if candidate.get_order() in survivors_orders:
+                index_remove = sorted_individuals[0][0]
+                del population[index_remove]
+
+            else:
+                survivors.append(candidate)
+                survivors_orders.append(candidate.get_order()) # not good when work with 929
+                index_remove = sorted_individuals[0][0]
+                del population[index_remove]
 
     return survivors
 

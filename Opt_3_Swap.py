@@ -233,15 +233,15 @@ def Opt_3(route_original:list,initial_cost:float,distanceMatrix,amount_cities):
 
     return route,initial_cost
 
-def cost(problem: TravelingSalesPersonProblem,order:list):
-    visited_edges = [(order[i], order[i + 1]) for i in range(0, len(order) - 1)]
-    visited_edges += [(order[len(order) - 1], order[0])]
-
-    path_weight = 0
-    for (a,b) in visited_edges:
-        path_weight += problem.get_weight(a,b)
-
-    return path_weight
+# def cost(problem: TravelingSalesPersonProblem,order:list):
+#     visited_edges = [(order[i], order[i + 1]) for i in range(0, len(order) - 1)]
+#     visited_edges += [(order[len(order) - 1], order[0])]
+#
+#     path_weight = 0
+#     for (a,b) in visited_edges:
+#         path_weight += problem.get_weight(a,b)
+#
+#     return path_weight
 
 
 # def run1(filename = "tour194.csv"):

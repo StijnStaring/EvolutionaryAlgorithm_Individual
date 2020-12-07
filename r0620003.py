@@ -9,6 +9,7 @@ from three_opt import *
 from elimination import elimination
 from DPX import DPX
 from collections import deque
+from Greedy_Mutation_2 import Greedy_Mutation_2
 from Greedy_Mutation import Greedy_Mutation
 from diverse_k_tournament_elimination import diverse_k_tournament_elimination
 import time
@@ -139,7 +140,7 @@ class r0620003:
             # population = [Greedy_Mutation(distanceMatrix, individual,mutation_rate) for individual in population]
             # et = time.time()
             # print("The time needed for all the mutations: %s" % (et - st))
-            k_elim = 3
+            # k_elim = 3
             """ The elimination forces all individuals in the population to be different solutions"""
             # st = time.time()
             population = diverse_k_tournament_elimination(population,k_elim,initial_population_size,amount_of_cities_to_visit)
@@ -231,7 +232,7 @@ def run(args):
     (initial_population_size,k_elim, mutation_rate, recombination_rate, termination_value) = args
     instance = r0620003()
     print("Running...")
-    result = instance.optimize("tour194.csv", initial_population_size=initial_population_size,k_elim = k_elim,mutation_rate = mutation_rate,recombination_rate = recombination_rate, termination_value=termination_value)
+    result = instance.optimize("tour29.csv", initial_population_size=initial_population_size,k_elim = k_elim,mutation_rate = mutation_rate,recombination_rate = recombination_rate, termination_value=termination_value)
     print("Finished")
     return result
 

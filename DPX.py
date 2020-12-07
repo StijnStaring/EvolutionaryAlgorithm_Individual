@@ -1,7 +1,7 @@
 import numpy as np
 from representation import TravelingSalesPersonIndividual
 from copy import deepcopy
-from random import randint,choice
+from random import choice
 
 def DPX(cost_matrix_original, parent_one:TravelingSalesPersonIndividual, parent_two:TravelingSalesPersonIndividual):
     order1 = parent_one.get_order()
