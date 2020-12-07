@@ -26,7 +26,7 @@ class r0620003:
 
     @staticmethod
     def initialize_population(problem:TravelingSalesPersonProblem, amount_of_cities_to_visit: int, initial_population_size: int) -> list:
-        # st = time.time()
+        st = time.time()
         population: list = list()
         random_order: list = [i for i in range(1, amount_of_cities_to_visit)]
         random_numbers_to_start = deepcopy(random_order)
@@ -65,16 +65,16 @@ class r0620003:
                 indiv.set_cost(cost_for_indiv)
                 population.append(indiv)
 
-        # # print("random_numbers_to_start: %s" % random_numbers_to_start)
-        # sorted_population = sorted(population, key=lambda individual: individual.get_cost())
-        # # print('after NN best score: %s'% sorted_population[0].get_cost())
-        # orders = [x.get_order() for x in sorted_population]
-        # scores = [x.get_cost() for x in sorted_population]
-        # print(scores)
-        # print(orders)
-        # et = time.time()
-        # time_diff = et - st
-        # print("Time needed for the initialization: %s " % time_diff)
+        # print("random_numbers_to_start: %s" % random_numbers_to_start)
+        sorted_population = sorted(population, key=lambda individual: individual.get_cost())
+        # print('after NN best score: %s'% sorted_population[0].get_cost())
+        orders = [x.get_order() for x in sorted_population]
+        scores = [x.get_cost() for x in sorted_population]
+        print(scores)
+        print(orders)
+        et = time.time()
+        time_diff = et - st
+        print("Time needed for the initialization: %s " % time_diff)
         return population
 
     # The evolutionary algorithm's main loop
@@ -237,4 +237,4 @@ def run(args):
     return result
 
 
-run((20,3, 0.20, 0.5, 80))
+run((20,3, 0.20, 0.5, 50))
