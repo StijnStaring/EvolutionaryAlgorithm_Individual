@@ -25,63 +25,55 @@ class r0620003:
 
     @staticmethod
     def initialize_population(problem:TravelingSalesPersonProblem, amount_of_cities_to_visit: int, initial_population_size: int) -> list:
-        st = time.time()
+        # st = time.time()
         population: list = list()
         random_order: list = [i for i in range(1, amount_of_cities_to_visit)]
         random_numbers_to_start = deepcopy(random_order)
         random_numbers_to_start.insert(0,0)
         for c in range(initial_population_size):
+            # print(population)
 
             indiv: TravelingSalesPersonIndividual = TravelingSalesPersonIndividual()
 
-            if c < int(initial_population_size / 2) and len(random_numbers_to_start) != 0:
+            if c < int(initial_population_size) and len(random_numbers_to_start) != 0:
                 random_city = choice(random_numbers_to_start)
                 random_numbers_to_start.remove(random_city)
-                candidate,cost_candidate = Nearest_Neighbor(amount_of_cities_to_visit, problem.weights,random_city)
-                candidate,cost_candidate = Opt_3(candidate,cost_candidate,problem.weights,amount_of_cities_to_visit) # how long have to search is a trade off between cost and profit
-                index_first_city = candidate.index(0)
-                amount_to_move = amount_of_cities_to_visit - index_first_city
-                items = deque(candidate)
-                items.rotate(amount_to_move)
-
-                if list(items) not in population:
-                    indiv.set_order(list(items))
+                if c > 0:
+                    candidate,cost_candidate = Nearest_Neighbor(amount_of_cities_to_visit, problem.weights,random_city)
+                    candidate,cost_candidate = Opt_3(candidate,cost_candidate,problem.weights,amount_of_cities_to_visit) # how long have to search is a trade off between cost and profit
+                    indiv.set_order(candidate)
                     indiv.set_cost(cost_candidate)
-                    # indiv.set_edges(edges_candidate)
                     population.append(indiv)
 
                 else:
-                    shuffle(random_order)
-                    order_for_indiv: list = deepcopy(random_order)
-                    order_for_indiv.insert(0, 0)
-                    indiv.set_order(order_for_indiv)
-                    cost_for_indiv = problem.calculate_individual_score(indiv)
-                    order_for_indiv, cost_for_indiv = Opt_3(order_for_indiv, cost_for_indiv, problem.weights, amount_of_cities_to_visit)
-                    indiv.set_order(order_for_indiv)
-                    indiv.set_cost(cost_for_indiv)
+                    candidate = list(range(amount_of_cities_to_visit))
+                    cost_candidate = cost(problem,candidate)
+                    candidate, cost_candidate = Opt_3(candidate, cost_candidate, problem.weights,amount_of_cities_to_visit)  # how long have to search is a trade off between cost and profit
+                    indiv.set_order(candidate)
+                    indiv.set_cost(cost_candidate)
                     population.append(indiv)
+
 
             else:
                 shuffle(random_order)
                 order_for_indiv: list = deepcopy(random_order)
                 order_for_indiv.insert(0, 0)
-                indiv.set_order(order_for_indiv)
-                cost_for_indiv = problem.calculate_individual_score(indiv)
+                cost_for_indiv = cost(problem, order_for_indiv)
                 order_for_indiv, cost_for_indiv = Opt_3(order_for_indiv, cost_for_indiv, problem.weights,amount_of_cities_to_visit)
                 indiv.set_order(order_for_indiv)
                 indiv.set_cost(cost_for_indiv)
                 population.append(indiv)
 
-        # print("random_numbers_to_start: %s" % random_numbers_to_start)
+        # # print("random_numbers_to_start: %s" % random_numbers_to_start)
         # sorted_population = sorted(population, key=lambda individual: individual.get_cost())
         # # print('after NN best score: %s'% sorted_population[0].get_cost())
         # orders = [x.get_order() for x in sorted_population]
         # scores = [x.get_cost() for x in sorted_population]
         # print(scores)
         # print(orders)
-        et = time.time()
-        time_diff = et - st
-        print("Time needed for the initialization: %s " % time_diff)
+        # et = time.time()
+        # time_diff = et - st
+        # print("Time needed for the initialization: %s " % time_diff)
         return population
 
     # The evolutionary algorithm's main loop
@@ -104,46 +96,55 @@ class r0620003:
         bestScore_current = 0
 
         iteration = 1
-        bestScore_individual = TravelingSalesPersonIndividual()
+        bestScore_individual_previous = TravelingSalesPersonIndividual()
 
         while count < termination_value:
             k = get_the_k_value(iteration)
-            if iteration > 1:
-                population.insert(0,bestScore_individual) # elitism --> insert the best individual
 
             offsprings: list = list()
-            t1 = time.time()
+            # t1 = time.time()
             for _ in range(initial_population_size):
             # for _ in range(int(10)):
                 if random() < recombination_rate:
                     # Select best candidates
-                    st = time.time()
+                    # st = time.time()
                     parent_one: TravelingSalesPersonIndividual = k_tournament(population, k) # Can also try the selection with increasing exploitation --> decreasing s
                     parent_two: TravelingSalesPersonIndividual = k_tournament(population, k)
-                    et = time.time()
-                    time_diff = et - st
-                    print("time needed for one k-selection: %s " % time_diff)
+                    # et = time.time()
+                    # time_diff = et - st
+                    # print("time needed for one k-selection: %s " % time_diff)
                     # Produce new offspring
-                    st = time.time()
-                    offspring = DPX(distanceMatrix,parent_one,parent_two)
-                    et = time.time()
-                    time_diff = et - st
-                    print("time needed for one offspring creation: %s " % time_diff)
+                    # st = time.time()
+                    offspring_route,offspring_cost = DPX(distanceMatrix,parent_one,parent_two)
+                    offspring_route, cost_candidate = Opt_3(offspring_route, offspring_cost, problem.weights,amount_of_cities_to_visit)  # how long have to search is a trade off between cost and profit
+                    offspring = TravelingSalesPersonIndividual()
+                    offspring.set_order(offspring_route)
+                    offspring.set_cost(offspring_cost)
+
+                    # et = time.time()
+                    # time_diff = et - st
+                    # print("time needed for one offspring creation: %s " % time_diff)
                     offsprings.append(offspring)
 
-            t2 = time.time()
-            print("The time needed for all the offsprings: %s"%(t2-t1))
+            # t2 = time.time()
+            # print("The time needed for all the offsprings: %s"%(t2-t1))
             population += offsprings
-            st = time.time()
-            population = [Greedy_Mutation(distanceMatrix, individual,mutation_rate) for individual in population]
-            et = time.time()
-            print("The time needed for all the mutations: %s" % (et - st))
+            # st = time.time()
+
+            for individual in population:
+                mutation_route,mutation_cost = Greedy_Mutation(distanceMatrix, individual, mutation_rate)
+                mutation_route, mutation_cost = Opt_3(mutation_route, mutation_cost, problem.weights,amount_of_cities_to_visit)  # how long have to search is a trade off between cost and profit
+                individual.set_order(mutation_route)
+                individual.set_cost(mutation_cost)
+            # population = [Greedy_Mutation(distanceMatrix, individual,mutation_rate) for individual in population]
+            # et = time.time()
+            # print("The time needed for all the mutations: %s" % (et - st))
             k_elim = 3
             """ The elimination forces all individuals in the population to be different solutions"""
-            st = time.time()
+            # st = time.time()
             population = diverse_k_tournament_elimination(population,k_elim,initial_population_size,amount_of_cities_to_visit)
-            et = time.time()
-            print("The time needed for all the elimination: %s" % (et - st))
+            # et = time.time()
+            # print("The time needed for all the elimination: %s" % (et - st))
 
                 # population[randint(0,amount_of_cities_to_visit - 1)] = offspring
             #     not good elimination!!! 
@@ -162,9 +163,17 @@ class r0620003:
             bestScore_individual = sorted_population[0]
             # bestScore_individual = population[0]
             bestScore_current = bestScore_individual.get_cost()
+            if  bestScore_current > bestScore_prev and iteration > 1:
+                population.insert(0, bestScore_individual_previous)
+                bestScore_individual = bestScore_individual_previous
+                bestScore_current = bestScore_prev
+            else:
+                bestScore_individual_previous = bestScore_individual
+
 
             # print("%s\t %s" % (np.around(bestScore_current,4),np.around(bestScore_prev,4)))
-
+            if np.around(bestScore_prev,0) < np.around(bestScore_current,0) and iteration > 1:
+                raise Exception("error")
             if np.around(bestScore_current, 4) == np.around(bestScore_prev, 4):
                 count += 1
             else:
@@ -208,14 +217,23 @@ def get_the_k_value(iteration:int) -> int:
     else:
         raise Exception("Should have been excepted by the previous cases. ")
 
+def cost(problem: TravelingSalesPersonProblem,order:list):
+    visited_edges = [(order[i], order[i + 1]) for i in range(0, len(order) - 1)]
+    visited_edges += [(order[len(order) - 1], order[0])]
+
+    path_weight = 0
+    for (a,b) in visited_edges:
+        path_weight += problem.get_weight(a,b)
+
+    return path_weight
 
 def run(args):
     (initial_population_size,k_elim, mutation_rate, recombination_rate, termination_value) = args
     instance = r0620003()
     print("Running...")
-    result = instance.optimize("tour29.csv", initial_population_size=initial_population_size,k_elim = k_elim,mutation_rate = mutation_rate,recombination_rate = recombination_rate, termination_value=termination_value)
+    result = instance.optimize("tour194.csv", initial_population_size=initial_population_size,k_elim = k_elim,mutation_rate = mutation_rate,recombination_rate = recombination_rate, termination_value=termination_value)
     print("Finished")
     return result
 
 
-run((100,3, 0.30, 1.0, 200))
+run((20,3, 0.20, 0.5, 80))

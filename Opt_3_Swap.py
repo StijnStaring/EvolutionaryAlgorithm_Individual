@@ -3,11 +3,15 @@ from copy import deepcopy
 from representation import TravelingSalesPersonProblem
 
 def Opt_3(route_original:list,initial_cost:float,distanceMatrix,amount_cities):
+    max_iterations = 20
+    iteration = 0
     route = deepcopy(route_original)
+    # bit_list = np.ones(amount_cities)
+    count = 0
+    while count <= amount_cities and iteration < max_iterations:
+        # print("count: %s"%count)
 
-    for _ in [0,1,2,3,4,5,6]:
         for i in range(amount_cities):
-
 
             """ Initialization of the current/next/previous cities """
             current_city = route[i]
@@ -163,6 +167,11 @@ def Opt_3(route_original:list,initial_cost:float,distanceMatrix,amount_cities):
                     break
 
             """ Swapping best suggestion """
+            if improvement1 <= 0 and improvement2 <= 0:
+                count += 1
+            else:
+                count = 0
+
             if improvement1 >= improvement2 and improvement1 > 0:
                 initial_cost -= improvement1
 
@@ -218,6 +227,8 @@ def Opt_3(route_original:list,initial_cost:float,distanceMatrix,amount_cities):
 
                 route = [current_city] + part1 + part2 + insert_part
 
+        iteration += 1
+
 
 
     return route,initial_cost
@@ -233,30 +244,30 @@ def cost(problem: TravelingSalesPersonProblem,order:list):
     return path_weight
 
 
-def run1(filename = "tour29.csv"):
-    import numpy as np
-    from random import shuffle
-    try_list = list(range(29))
-    # try_list = [16, 17, 18, 21, 22, 20, 28, 27, 25, 19, 26, 24, 23, 15, 13, 12, 11, 10, 9, 7, 3, 4, 5, 1, 0, 2, 6, 8, 14]
-    shuffle(try_list)
-
-    file = open(filename)
-    distanceMatrix = np.loadtxt(file, delimiter=",")
-    file.close()
-
-    problem = TravelingSalesPersonProblem(distanceMatrix)
-    KOST = cost(problem,try_list)
-    print("The start KOST: %s" % KOST)
-
-    print("Running...")
-    print("The original route: %s" % try_list)
-    new_route,new_cost = Opt_3(try_list,KOST,distanceMatrix,len(distanceMatrix))
-    print("The new route: %s" % new_route)
-    print("the new cost: %s" % new_cost)
-    cost_check = cost(problem, new_route)
-    print("the cost check is: %s" % cost_check)
-    print("Finished")
-
-run1()
+# def run1(filename = "tour194.csv"):
+#     import numpy as np
+#     from random import shuffle
+#     try_list = list(range(194))
+#     # try_list = [16, 17, 18, 21, 22, 20, 28, 27, 25, 19, 26, 24, 23, 15, 13, 12, 11, 10, 9, 7, 3, 4, 5, 1, 0, 2, 6, 8, 14]
+#     shuffle(try_list)
+#
+#     file = open(filename)
+#     distanceMatrix = np.loadtxt(file, delimiter=",")
+#     file.close()
+#
+#     problem = TravelingSalesPersonProblem(distanceMatrix)
+#     KOST = cost(problem,try_list)
+#     print("The start KOST: %s" % KOST)
+#
+#     print("Running...")
+#     print("The original route: %s" % try_list)
+#     new_route,new_cost = Opt_3(try_list,KOST,distanceMatrix,len(distanceMatrix))
+#     print("The new route: %s" % new_route)
+#     print("the new cost: %s" % new_cost)
+#     cost_check = cost(problem, new_route)
+#     print("the cost check is: %s" % cost_check)
+#     print("Finished")
+#
+# run1()
 
 

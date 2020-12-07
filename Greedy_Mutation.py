@@ -5,7 +5,11 @@ from random import randint,choice,random
 
 def Greedy_Mutation(cost_matrix_original, parent_one:TravelingSalesPersonIndividual, mutation_rate:float):
     if random() > mutation_rate:
-        return parent_one
+        # return parent_one
+        order1 = parent_one.get_order()
+        cost1 = parent_one.get_cost()
+        return order1,cost1
+
 
     else:
 
@@ -35,11 +39,12 @@ def Greedy_Mutation(cost_matrix_original, parent_one:TravelingSalesPersonIndivid
         amount_of_cities_to_visit = len(cost_matrix_original)
 
         if len(inters) == amount_of_cities_to_visit:
-            offspring = TravelingSalesPersonIndividual()
-            offspring.set_order(order1)
+            # offspring = TravelingSalesPersonIndividual()
+            # offspring.set_order(order1)
             cost1 = parent_one.get_cost()
-            offspring.set_cost(cost1)
-            return offspring
+            # offspring.set_cost(cost1)
+            # return offspring
+            return order1,cost1
     #     inters = [(918, 323), (685, 606),(700,701)]
     #     print("inters is: %s " % inters)
 
@@ -108,7 +113,8 @@ def Greedy_Mutation(cost_matrix_original, parent_one:TravelingSalesPersonIndivid
             raise Exception("error: in the amount of cities to visit")
 
         # return offspring,inters,NN_cost
-        return offspring
+        # return offspring
+        return NN_route,NN_cost
 
 def fun(current_city,list_edges):
 

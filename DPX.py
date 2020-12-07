@@ -18,11 +18,12 @@ def DPX(cost_matrix_original, parent_one:TravelingSalesPersonIndividual, parent_
     amount_of_cities_to_visit = len(cost_matrix_original)
 
     if len(inters) == amount_of_cities_to_visit:
-        offspring = TravelingSalesPersonIndividual()
-        offspring.set_order(order1)
+        # offspring = TravelingSalesPersonIndividual()
+        # offspring.set_order(order1)
         cost1 = parent_one.get_cost()
-        offspring.set_cost(cost1)
-        return offspring
+        # offspring.set_cost(cost1)
+        # return offspring
+        return order1,cost1
 #     inters = [(918, 323), (685, 606),(700,701)]
 #     print("inters is: %s " % inters)
 
@@ -79,14 +80,14 @@ def DPX(cost_matrix_original, parent_one:TravelingSalesPersonIndividual, parent_
     NN_cost += cost_matrix_original[current_city][random_city]
     # NN_edges.append((current_city,random_city))
 
-    offspring = TravelingSalesPersonIndividual()
-    offspring.set_order(NN_route)
-    offspring.set_cost(NN_cost)
+    # offspring = TravelingSalesPersonIndividual()
+    # offspring.set_order(NN_route)
+    # offspring.set_cost(NN_cost)
     if len(set(NN_route)) != amount_of_cities_to_visit:
         raise Exception("error: in the amount of cities to visit")
 
     # return offspring,inters,NN_cost
-    return offspring
+    return NN_route,NN_cost
 
 def fun(current_city,list_edges):
 
