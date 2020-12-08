@@ -225,13 +225,13 @@ def run(args):
 	(initial_population_size, p, termination_value) = args
 	instance = r0620003()
 	print("Running...")
-	result = instance.optimize("tour100.csv", initial_population_size=initial_population_size, p = p, termination_value = termination_value)
+	result = instance.optimize("tour29.csv", initial_population_size=initial_population_size, p = p, termination_value = termination_value)
 	print("Finished")
 	return result
 
 
 
-run((20,0.02,100))
+run((100,0.02,100)) # only three parameters makes the code more robust.
 
 
 

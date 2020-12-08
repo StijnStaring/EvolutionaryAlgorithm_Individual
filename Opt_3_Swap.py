@@ -106,6 +106,7 @@ def Opt_3(route_original:list,distanceMatrix,amount_cities):
                     # if any(abs(x) == np.inf for x in [costs1_relative,distanceMatrix[city_end_next][next_city],distanceMatrix[city_end_next][next_city],distanceMatrix[city_end][city_D],cost_original,cost_reversed]):
                     #     improvement1 = 0
                     # else:
+                    # When the tour100 is run an invalid value is encountered. This is not a problem. The code above can take the warning away but is redundant with code below.
                     improvement1 = costs1_relative + distanceMatrix[city_end][city_end_next] - distanceMatrix[city_end_next][next_city]  - distanceMatrix[city_end][city_D] + cost_original - cost_reversed
                     # print("improvement 1: %s" % improvement1)
                     # if np.isnan(improvement1):
@@ -172,6 +173,7 @@ def Opt_3(route_original:list,distanceMatrix,amount_cities):
                     # if any(abs(x) == np.inf for x in [costs1_relative, distanceMatrix[city_end][city_end_next], distanceMatrix[city_end][city_D], distanceMatrix[previous_city][city_end_next]]):
                     #     improvement2 = 0
                     # else:
+                    # When the tour100 is run an invalid value is encountered. This is not a problem. The code above can take the warning away but is redundant with code below.
                     improvement2 = costs1_relative + distanceMatrix[city_end][city_end_next] - distanceMatrix[city_end][city_D] - distanceMatrix[previous_city][city_end_next]
                     memory_cities2 = [city_end_next_i, city_D_i,c,city_end]
                     # print("improvement 2: %s" % improvement2)
