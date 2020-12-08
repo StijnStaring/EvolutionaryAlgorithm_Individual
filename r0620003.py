@@ -133,6 +133,7 @@ class r0620003:
             # st = time.time()
 
             for individual in population:
+                # mutation_route, mutation_cost = Greedy_Mutation_2(distanceMatrix, individual, mutation_rate, amount_of_cities_to_visit)
                 mutation_route,mutation_cost = Greedy_Mutation(distanceMatrix, individual, mutation_rate)
                 mutation_route, mutation_cost = Opt_3(mutation_route, mutation_cost, problem.weights,amount_of_cities_to_visit)  # how long have to search is a trade off between cost and profit
                 individual.set_order(mutation_route)
@@ -237,4 +238,4 @@ def run(args):
     return result
 
 
-run((20,3, 0.20, 0.5, 50))
+run((100,3, 0.20, 0.5, 80))
