@@ -1,11 +1,22 @@
 import Reporter
 import numpy as np
+# from k_tournament import k_tournament
 from copy import deepcopy
-from random import shuffle,random,randint,choice
+from random import shuffle, random, randint, choice
 from representation import TravelingSalesPersonIndividual, TravelingSalesPersonProblem
-from inversion import inversion # should be in the same file when submit
 from Nearest_Neighbor import Nearest_Neighbor
-
+# from three_opt import *
+# from elimination import elimination
+# from DPX import DPX
+# from collections import deque
+# from Greedy_Mutation_2 import Greedy_Mutation_2
+# from Greedy_Mutation import Greedy_Mutation
+# from diverse_k_tournament_elimination import diverse_k_tournament_elimination
+# import time
+from Opt_3_Swap import Opt_3
+# from SCX import SCX
+# from DPX import DPX
+from inversion import inversion  # should be in the same file when submit
 class r0620003:
 
 	def __init__(self):
@@ -28,38 +39,62 @@ class r0620003:
 	# 	return return_value
 
 	@staticmethod
-	def initialize_population(problem: TravelingSalesPersonProblem, amount_of_cities_to_visit: int,initial_population_size: int) -> list:
+	def initialize_population(problem: TravelingSalesPersonProblem, amount_of_cities_to_visit: int,
+							  initial_population_size: int) -> list:
+		# st = time.time()
 		population: list = list()
 		random_order: list = [i for i in range(1, amount_of_cities_to_visit)]
+		random_numbers_to_start = deepcopy(random_order)
+		random_numbers_to_start.insert(0, 0)
 		for c in range(initial_population_size):
+			# print("individuals added: %s " % len(population))
 
 			indiv: TravelingSalesPersonIndividual = TravelingSalesPersonIndividual()
+
 			if c < int(initial_population_size):
-				candidate, cost_candidate = Nearest_Neighbor(amount_of_cities_to_visit, problem.weights)
-				# candidate,cost_candidate = opt_3_local_search(problem, candidate,cost_candidate, max_iterations = 50) # how long have to search is a trade off between cost and profit
+				# random_city = choice(random_numbers_to_start)
+				# random_numbers_to_start.remove(random_city)
+				# if c > 0:
+				candidate,random_numbers_to_start = Nearest_Neighbor(amount_of_cities_to_visit, problem.weights,random_numbers_to_start)
+				candidate = Opt_3(candidate, problem.weights,amount_of_cities_to_visit)  # how long have to search is a trade off between cost and profit
 				indiv.set_order(candidate)
-				indiv.set_cost(cost_candidate)
-				# indiv.set_edges(edges_candidate)
+				# indiv.set_cost(cost_candidate)
 				population.append(indiv)
 
-			else:
-				shuffle(random_order)
-				order_for_indiv: list = deepcopy(random_order)
-				order_for_indiv.insert(0, 0)
-				indiv.set_order(order_for_indiv)
-				cost_for_indiv = problem.calculate_individual_score(indiv)
-				# candidate, cost_candidate = opt_3_local_search(problem, order_for_indiv, cost_for_indiv,max_iterations=10)  # how long have to search is a trade off between cost and profit
-				# indiv.set_order(candidate)
-				indiv.set_cost(cost_for_indiv)
-				population.append(indiv)
+				# else:
+				# 	candidate = list(range(amount_of_cities_to_visit))
+				# 	# cost_candidate = cost(problem, candidate)
+				# 	candidate = Opt_3(candidate, problem.weights,amount_of_cities_to_visit) # how long have to search is a trade off between cost and profit
+				# 	indiv.set_order(candidate)
+				# 	# indiv.set_cost(cost_candidate)
+				# 	population.append(indiv)
 
+
+			# else:
+			# 	shuffle(random_order)
+			# 	order_for_indiv: list = deepcopy(random_order)
+			# 	order_for_indiv.insert(0, 0)
+			# 	# cost_for_indiv = cost(problem, order_for_indiv)
+			# 	order_for_indiv = Opt_3(order_for_indiv, problem.weights, amount_of_cities_to_visit)
+
+
+
+				# order_for_indiv, cost_for_indiv = Opt_3(order_for_indiv, cost_for_indiv, problem.weights,
+				# 										amount_of_cities_to_visit)
+				# indiv.set_order(order_for_indiv)
+				# # indiv.set_cost(cost_for_indiv)
+				# population.append(indiv)
+
+		# print("random_numbers_to_start: %s" % random_numbers_to_start)
 		# sorted_population = sorted(population, key=lambda individual: individual.get_cost())
-		# print('after NN best score: %s' % sorted_population[0].get_cost())
+		# # print('after NN best score: %s'% sorted_population[0].get_cost())
 		# orders = [x.get_order() for x in sorted_population]
 		# scores = [x.get_cost() for x in sorted_population]
 		# print(scores)
 		# print(orders)
-
+		# et = time.time()
+		# time_diff = et - st
+		# print("Time needed for the initialization: %s " % time_diff)
 		return population
 
 	# The evolutionary algorithm's main loop
@@ -85,7 +120,6 @@ class r0620003:
 
 		iteration = 1
 		while count < termination_value:
-
 
 			for i in range(0,len(population),1):
 				ind = population[i]
@@ -120,6 +154,7 @@ class r0620003:
 						c_accent =  selected_indiv[index1]
 
 					if c_accent == c_next or c_accent == c_prev:
+						copy_ind_order = Opt_3(copy_ind_order, problem.weights, amount_of_cities_to_visit)
 						break
 
 					# print("This is copy_ind_order before: %s." % copy_ind_order)
@@ -127,7 +162,8 @@ class r0620003:
 					# print("This is copy_ind_order after: %s." % copy_ind_order)
 					c = c_accent
 
-				if problem.calculate_individual_score(copy_ind) <= problem.calculate_individual_score(ind):
+				copy_ind.set_order(copy_ind_order)
+				if problem.calculate_individual_score(copy_ind) < problem.calculate_individual_score(ind):
 					population[i] = copy_ind
 
 			sorted_list_of_individuals = sorted(population,key=lambda individual: problem.calculate_individual_score(individual))
@@ -142,7 +178,8 @@ class r0620003:
 			bestScore_current = scores[0]
 			# print("%s\t %s" % (np.around(bestScore_current,4),np.around(bestScore_prev,4)))
 
-			if np.around(bestScore_current,4) == np.around(bestScore_prev,4):
+			if bestScore_current == bestScore_prev:
+			# if np.around(bestScore_current,4) == np.around(bestScore_prev,4):
 				count += 1
 			else:
 				count = 0
@@ -150,8 +187,10 @@ class r0620003:
 			history_best_objectives.append(bestScore_current)
 			meanScore = sum(scores) / len(scores)
 			history_mean_objectives.append(meanScore)
-			print("Mean objective: %s\tBest objective: %s\tBest individual %s" % (meanScore, bestScore_current,bestIndividual))
+			print("It: %s\tMean objective: %s\tBest objective: %s\tBest individual %s" % (iteration,meanScore, bestScore_current,bestIndividual))
+
 			iteration += 1
+
 
 			# Call the reporter with:
 			#  - the mean objective function value of the population
@@ -171,17 +210,28 @@ class r0620003:
 		return bestScore_current
 
 
+def cost(problem: TravelingSalesPersonProblem,order:list):
+	visited_edges = [(order[i], order[i + 1]) for i in range(0, len(order) - 1)]
+	visited_edges += [(order[len(order) - 1], order[0])]
+
+	path_weight = 0
+	for (a,b) in visited_edges:
+		path_weight += problem.get_weight(a,b)
+
+	return path_weight
+
+
 def run(args):
 	(initial_population_size, p, termination_value) = args
 	instance = r0620003()
 	print("Running...")
-	result = instance.optimize("tour929.csv", initial_population_size=initial_population_size, p = p, termination_value = termination_value)
+	result = instance.optimize("tour100.csv", initial_population_size=initial_population_size, p = p, termination_value = termination_value)
 	print("Finished")
 	return result
 
 
 
-run((200,0.02,10000))
+run((20,0.02,100))
 
 
 
