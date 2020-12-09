@@ -12,7 +12,7 @@ from Nearest_Neighbor import Nearest_Neighbor
 # from Greedy_Mutation_2 import Greedy_Mutation_2
 # from Greedy_Mutation import Greedy_Mutation
 # from diverse_k_tournament_elimination import diverse_k_tournament_elimination
-# import time
+import time
 from Opt_3_Swap import Opt_3
 # from SCX import SCX
 # from DPX import DPX
@@ -41,7 +41,7 @@ class r0620003:
 	@staticmethod
 	def initialize_population(problem: TravelingSalesPersonProblem, amount_of_cities_to_visit: int,
 							  initial_population_size: int) -> list:
-		# st = time.time()
+		st = time.time()
 		population: list = list()
 		random_order: list = [i for i in range(1, amount_of_cities_to_visit)]
 		random_numbers_to_start = deepcopy(random_order)
@@ -92,9 +92,9 @@ class r0620003:
 		# scores = [x.get_cost() for x in sorted_population]
 		# print(scores)
 		# print(orders)
-		# et = time.time()
-		# time_diff = et - st
-		# print("Time needed for the initialization: %s " % time_diff)
+		et = time.time()
+		time_diff = et - st
+		print("Time needed for the initialization: %s " % time_diff)
 		return population
 
 	# The evolutionary algorithm's main loop
