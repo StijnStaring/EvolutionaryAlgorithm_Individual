@@ -233,9 +233,9 @@ def run(args):
     (initial_population_size,k_elim, mutation_rate, recombination_rate, termination_value) = args
     instance = r0620003()
     print("Running...")
-    result = instance.optimize("tour29.csv", initial_population_size=initial_population_size,k_elim = k_elim,mutation_rate = mutation_rate,recombination_rate = recombination_rate, termination_value=termination_value)
+    result = instance.optimize("tour194.csv", initial_population_size=initial_population_size,k_elim = k_elim,mutation_rate = mutation_rate,recombination_rate = recombination_rate, termination_value=termination_value)
     print("Finished")
     return result
 
 
-run((100,3, 0.20, 0.5, 80))
+run((20,3, 0.20, 0.5, 100))

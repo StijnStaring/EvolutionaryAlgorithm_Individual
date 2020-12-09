@@ -3,7 +3,7 @@ from copy import deepcopy
 from representation import TravelingSalesPersonProblem
 
 def Opt_3(route_original:list,initial_cost:float,distanceMatrix,amount_cities):
-    max_iterations = 20
+    max_iterations = 1
     iteration = 0
     route = deepcopy(route_original)
     # bit_list = np.ones(amount_cities)
