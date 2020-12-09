@@ -2,8 +2,8 @@ import numpy as np
 from copy import deepcopy
 from representation import TravelingSalesPersonProblem
 
-def Opt_3(route_original:list,distanceMatrix,amount_cities):
-    max_iterations = 1
+def Opt_3(route_original:list,distanceMatrix,amount_cities,max_iterations=1):
+    # max_iterations = 3
     iteration = 0
     route = deepcopy(route_original)
     # bit_list = np.ones(amount_cities)
