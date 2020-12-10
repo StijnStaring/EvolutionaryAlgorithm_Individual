@@ -121,7 +121,8 @@ class r0620003:
 		time_history: list = []
 		count = 0
 		result_history_length = 50
-		# bestScore_current = 0
+		bestScore_current = 0
+		meanScore = 0
 
 		iteration = 1
 		while count < termination_value:
@@ -207,9 +208,9 @@ class r0620003:
 			time_history.append(time_b)
 
 			# Reduce memory
-			# if len(history_mean_objectives) > result_history_length:
-			# 	history_mean_objectives.pop(0)
-			# 	history_best_objectives.pop(0)
+			if len(history_mean_objectives) > result_history_length:
+				history_mean_objectives.pop(0)
+				history_best_objectives.pop(0)
 
 			if timeLeft < 0:
 				break
@@ -217,8 +218,8 @@ class r0620003:
 		# time_b = 300 - timeLeft
 
 
-		# return bestScore_current, meanScore
-		return history_best_objectives,history_mean_objectives,time_history
+		return bestScore_current, meanScore
+		# return history_best_objectives,history_mean_objectives,time_history
 
 def cost(problem: TravelingSalesPersonProblem,order:list):
 	visited_edges = [(order[i], order[i + 1]) for i in range(0, len(order) - 1)]
@@ -254,48 +255,49 @@ def convergence_plot(runs: int = 3, file = "tour929.csv", initial_population_siz
 	plt.legend(['bestObjective','meanObjective','bestObjective','meanObjective','bestObjective','meanObjective'])
 	plt.show()
 
-convergence_plot()
+# convergence_plot()
 
 
 # def histograms(runs: int = 3, file = "tour29.csv", initial_population_size=100, p = 0.02, termination_value = 50,max_iterations = 5):
-# 	collection_best_score = []
-# 	collection_mean_score = []
-#
-# 	for _ in range(1000):
-# 		instance = r0620003()
-# 		best,mean = instance.optimize(file, initial_population_size=initial_population_size, p=p,termination_value=termination_value, max_iterations=max_iterations)
-# 		collection_best_score.append(best)
-# 		collection_mean_score.append(mean)
-#
-# 	collection_best_score = np.array(collection_best_score)
-# 	print("The mean of the best solutions is: %s \nThe standard deviation of the best solutions is: %s" % (np.mean(collection_best_score),np.std(collection_best_score)))
-# 	collection_mean_score = np.array(collection_mean_score)
-# 	print("The mean of the mean solutions is: %s \nThe standard deviation of the mean solutions is: %s" % (np.mean(collection_mean_score), np.std(collection_mean_score)))
-#
-# 	plt.figure(figsize=[10,8])
-# 	n, bins, patches = plt.hist(x=collection_best_score, bins='auto', color='#0504aa',alpha=0.7, rwidth=0.85)
-# 	plt.grid(axis='y', alpha=0.75)
-# 	plt.xlabel('Value',fontsize=15)
-# 	plt.xticks(fontsize=15)
-# 	plt.yticks(fontsize=15)
-# 	plt.ylabel('Frequency',fontsize=15)
-# 	plt.title('Distribution of the best solutions',fontsize=15)
-#
-# 	plt.figure(figsize=[10, 8])
-# 	n, bins, patches = plt.hist(x=collection_mean_score, bins='auto', color='#0504aa', alpha=0.7, rwidth=0.85)
-# 	plt.grid(axis='y', alpha=0.75)
-# 	plt.xlabel('Value', fontsize=15)
-# 	plt.ylabel('Frequency', fontsize=15)
-# 	plt.xticks(fontsize=15)
-# 	plt.yticks(fontsize=15)
-# 	plt.title('Distribution of the mean solutions', fontsize=15)
-#
-# 	plt.show()
+def histograms(collection_best_score: list, collection_mean_score: list):
+	# collection_best_score = []
+	# collection_mean_score = []
+
+	# for _ in range(1000):
+	# 	instance = r0620003()
+	# 	best,mean = instance.optimize(file, initial_population_size=initial_population_size, p=p,termination_value=termination_value, max_iterations=max_iterations)
+	# 	collection_best_score.append(best)
+	# 	collection_mean_score.append(mean)
+
+	collection_best_score = np.array(collection_best_score)
+	print("The mean of the best solutions is: %s \nThe standard deviation of the best solutions is: %s" % (np.mean(collection_best_score),np.std(collection_best_score)))
+	collection_mean_score = np.array(collection_mean_score)
+	print("The mean of the mean solutions is: %s \nThe standard deviation of the mean solutions is: %s" % (np.mean(collection_mean_score), np.std(collection_mean_score)))
+
+	plt.figure(figsize=[10,8])
+	n, bins, patches = plt.hist(x=collection_best_score, bins='auto', color='#0504aa',alpha=0.7, rwidth=0.85)
+	plt.grid(axis='y', alpha=0.75)
+	plt.xlabel('Value',fontsize=15)
+	plt.xticks(fontsize=15)
+	plt.yticks(fontsize=15)
+	plt.ylabel('Frequency',fontsize=15)
+	plt.title('Distribution of the best solutions',fontsize=15)
+
+	plt.figure(figsize=[10, 8])
+	n, bins, patches = plt.hist(x=collection_mean_score, bins='auto', color='#0504aa', alpha=0.7, rwidth=0.85)
+	plt.grid(axis='y', alpha=0.75)
+	plt.xlabel('Value', fontsize=15)
+	plt.ylabel('Frequency', fontsize=15)
+	plt.xticks(fontsize=15)
+	plt.yticks(fontsize=15)
+	plt.title('Distribution of the mean solutions', fontsize=15)
+
+	plt.show()
 
 # histograms()
 
 def run_once(args):
-	(initial_population_size, p, termination_value,max_iterations) = args
+	(initial_population_size, p, termination_value, max_iterations) = args
 	instance = r0620003()
 	#print("Running...")
 	result = instance.optimize("tour29.csv", initial_population_size=initial_population_size, p=p, termination_value= termination_value, max_iterations = max_iterations)
@@ -305,14 +307,20 @@ def run_once(args):
 if __name__ == "__main__":
 	print("Running this file on a PC with %s cores..." % (cpu_count()))
 
-	results_file_name = str(time.time()) + ".txt"
-	results_file = open(results_file_name, "w")
-	results_file.close()
+	# results_file_name = str(time.time()) + ".txt"
+	# results_file = open(results_file_name, "w")
+	# results_file.close()
 
-	poss_initial_population_sizes = [20,75,100,150]
-	poss_ps = [0.02, 0.15,0.25]
-	poss_termination_values = [100]
-	poss_Opt_3_iterations = [1,3,5]
+	# poss_initial_population_sizes = [20,75,100,150]
+	# poss_ps = [0.02, 0.15,0.25]
+	# poss_termination_values = [100]
+	# poss_Opt_3_iterations = [1,3,5]
+
+
+	poss_initial_population_sizes = [100]
+	poss_ps = [0.02]
+	poss_termination_values = [50]
+	poss_Opt_3_iterations = [5]
 
 	amount_of_possibilities: int = len(poss_initial_population_sizes) * len(poss_ps) * len(poss_termination_values) * len(poss_Opt_3_iterations)
 	current_possibility_index: int = 1
@@ -322,32 +330,40 @@ if __name__ == "__main__":
 		for poss_p in poss_ps:
 			for poss_Opt_3_iteration in poss_Opt_3_iterations:
 				for poss_termination_value in poss_termination_values:
-						amount_of_iterations = 8
+						amount_of_iterations = 1000
 						p = Pool(processes=cpu_count())
 						results = p.map(run_once, [(poss_initial_population_size, poss_p, poss_termination_value, poss_Opt_3_iteration) for i in range(amount_of_iterations)])
 
 						# average_score = np.mean(results)
-						scores = [i[0] for i in results]
-						times = [i[1] for i in results]
-						best_score = min(scores)
-						avg_score = np.mean(scores)
-						avg_times = np.mean(times)
+						# scores = [i[0] for i in results]
+						# times = [i[1] for i in results]
 
-						results_file = open(results_file_name, "a")
-						results_file.write("#" * 50 + "\r\n")
-						results_file.write("Initial population size: %s" % poss_initial_population_size + "\r\n")
-						# results_file.write("Amount of offsprings: %s" % poss_amount_of_offspring + "\r\n")
-						# results_file.write("Amount of offsprings: %s" % poss_amount_of_offspring + "\r\n")
-						# results_file.write("k (selection): %s" % poss_k + "\r\n")
-						results_file.write("p (mutation): %s" % poss_p + "\r\n")
-						results_file.write("poss_Opt_3_iteration: %s" % poss_Opt_3_iteration + "\r\n")
-						# results_file.write("Recombination rate: %s" % poss_recombination_rate + "\r\n")
-						results_file.write("# of termination iterations: %s" % poss_termination_value + "\r\n")
-						results_file.write("Best score over %s iterations: %s" % (amount_of_iterations, best_score) + "\r\n")
-						results_file.write("Mean score over %s iterations:	%s" % (amount_of_iterations, avg_score) + "\r\n")
-						results_file.write("Mean time used:	%s  iterations: %s" % (amount_of_iterations, avg_times) + "\r\n")
-						results_file.write(("#" * 50) + "\r\n")
-						results_file.close()
+						collection_best_score = [i[0] for i in results]
+						collection_mean_score = [i[1] for i in results]
+
+						histograms(collection_best_score, collection_mean_score)
+
+
+
+						# best_score = min(scores)
+						# avg_score = np.mean(scores)
+						# avg_times = np.mean(times)
+
+						# results_file = open(results_file_name, "a")
+						# results_file.write("#" * 50 + "\r\n")
+						# results_file.write("Initial population size: %s" % poss_initial_population_size + "\r\n")
+						# # results_file.write("Amount of offsprings: %s" % poss_amount_of_offspring + "\r\n")
+						# # results_file.write("Amount of offsprings: %s" % poss_amount_of_offspring + "\r\n")
+						# # results_file.write("k (selection): %s" % poss_k + "\r\n")
+						# results_file.write("p (mutation): %s" % poss_p + "\r\n")
+						# results_file.write("poss_Opt_3_iteration: %s" % poss_Opt_3_iteration + "\r\n")
+						# # results_file.write("Recombination rate: %s" % poss_recombination_rate + "\r\n")
+						# results_file.write("# of termination iterations: %s" % poss_termination_value + "\r\n")
+						# results_file.write("Best score over %s iterations: %s" % (amount_of_iterations, best_score) + "\r\n")
+						# results_file.write("Mean score over %s iterations:	%s" % (amount_of_iterations, avg_score) + "\r\n")
+						# results_file.write("Mean time used:	%s  iterations: %s" % (amount_of_iterations, avg_times) + "\r\n")
+						# results_file.write(("#" * 50) + "\r\n")
+						# results_file.close()
 
 						print("Completed %s / %s..." % (current_possibility_index, amount_of_possibilities))
 						current_possibility_index += 1
