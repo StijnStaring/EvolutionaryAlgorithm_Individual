@@ -302,6 +302,7 @@ def run_once(args):
 	#print("Running...")
 	result = instance.optimize("tour29.csv", initial_population_size=initial_population_size, p=p, termination_value= termination_value, max_iterations = max_iterations)
 	return result
+# test
 
 
 if __name__ == "__main__":
