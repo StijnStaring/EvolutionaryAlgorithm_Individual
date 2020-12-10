@@ -97,6 +97,7 @@ class r0620003:
 		# et = time.time()
 		# time_diff = et - st
 		# print("Time needed for the initialization: %s " % time_diff)
+		print('population initiated')
 		return population
 
 	# The evolutionary algorithm's main loop
@@ -120,7 +121,7 @@ class r0620003:
 		time_history: list = []
 		count = 0
 		result_history_length = 50
-		bestScore_current = 0
+		# bestScore_current = 0
 
 		iteration = 1
 		while count < termination_value:
@@ -202,8 +203,8 @@ class r0620003:
 			#  - a 1D numpy array in the cycle notation containing the best solution
 
 			timeLeft = self.reporter.report(meanScore, bestScore_current, np.array(bestIndividual))
-			# time_b = 300 - timeLeft
-			# time_history.append(time_b)
+			time_b = 300 - timeLeft
+			time_history.append(time_b)
 
 			# Reduce memory
 			# if len(history_mean_objectives) > result_history_length:
@@ -216,8 +217,8 @@ class r0620003:
 		# time_b = 300 - timeLeft
 
 
-		return bestScore_current, meanScore
-		# return history_best_objectives,history_mean_objectives,time_history
+		# return bestScore_current, meanScore
+		return history_best_objectives,history_mean_objectives,time_history
 
 def cost(problem: TravelingSalesPersonProblem,order:list):
 	visited_edges = [(order[i], order[i + 1]) for i in range(0, len(order) - 1)]
@@ -241,7 +242,7 @@ def run(args):
 
 # run((100,0.02,100,5)) # only three parameters makes the code more robust.
 
-def convergence_plot(runs: int = 3, file = "tour29.csv", initial_population_size=100, p = 0.02, termination_value = 20,max_iterations = 5):
+def convergence_plot(runs: int = 3, file = "tour929.csv", initial_population_size=50, p = 0.02, termination_value = 100,max_iterations = 1):
 	colours = ['b','r','g']
 	axis = figure_layout(titel="Convergence", xlabel="Time [s]",ylabel="Cost [-]")
 	for i in range(runs):
@@ -253,45 +254,45 @@ def convergence_plot(runs: int = 3, file = "tour29.csv", initial_population_size
 	plt.legend(['bestObjective','meanObjective','bestObjective','meanObjective','bestObjective','meanObjective'])
 	plt.show()
 
-# convergence_plot()
+convergence_plot()
 
 
-def histograms(runs: int = 3, file = "tour29.csv", initial_population_size=100, p = 0.02, termination_value = 50,max_iterations = 5):
-	collection_best_score = []
-	collection_mean_score = []
+# def histograms(runs: int = 3, file = "tour29.csv", initial_population_size=100, p = 0.02, termination_value = 50,max_iterations = 5):
+# 	collection_best_score = []
+# 	collection_mean_score = []
+#
+# 	for _ in range(1000):
+# 		instance = r0620003()
+# 		best,mean = instance.optimize(file, initial_population_size=initial_population_size, p=p,termination_value=termination_value, max_iterations=max_iterations)
+# 		collection_best_score.append(best)
+# 		collection_mean_score.append(mean)
+#
+# 	collection_best_score = np.array(collection_best_score)
+# 	print("The mean of the best solutions is: %s \nThe standard deviation of the best solutions is: %s" % (np.mean(collection_best_score),np.std(collection_best_score)))
+# 	collection_mean_score = np.array(collection_mean_score)
+# 	print("The mean of the mean solutions is: %s \nThe standard deviation of the mean solutions is: %s" % (np.mean(collection_mean_score), np.std(collection_mean_score)))
+#
+# 	plt.figure(figsize=[10,8])
+# 	n, bins, patches = plt.hist(x=collection_best_score, bins='auto', color='#0504aa',alpha=0.7, rwidth=0.85)
+# 	plt.grid(axis='y', alpha=0.75)
+# 	plt.xlabel('Value',fontsize=15)
+# 	plt.xticks(fontsize=15)
+# 	plt.yticks(fontsize=15)
+# 	plt.ylabel('Frequency',fontsize=15)
+# 	plt.title('Distribution of the best solutions',fontsize=15)
+#
+# 	plt.figure(figsize=[10, 8])
+# 	n, bins, patches = plt.hist(x=collection_mean_score, bins='auto', color='#0504aa', alpha=0.7, rwidth=0.85)
+# 	plt.grid(axis='y', alpha=0.75)
+# 	plt.xlabel('Value', fontsize=15)
+# 	plt.ylabel('Frequency', fontsize=15)
+# 	plt.xticks(fontsize=15)
+# 	plt.yticks(fontsize=15)
+# 	plt.title('Distribution of the mean solutions', fontsize=15)
+#
+# 	plt.show()
 
-	for _ in range(1000):
-		instance = r0620003()
-		best,mean = instance.optimize(file, initial_population_size=initial_population_size, p=p,termination_value=termination_value, max_iterations=max_iterations)
-		collection_best_score.append(best)
-		collection_mean_score.append(mean)
-
-	collection_best_score = np.array(collection_best_score)
-	print("The mean of the best solutions is: %s \nThe standard deviation of the best solutions is: %s" % (np.mean(collection_best_score),np.std(collection_best_score)))
-	collection_mean_score = np.array(collection_mean_score)
-	print("The mean of the mean solutions is: %s \nThe standard deviation of the mean solutions is: %s" % (np.mean(collection_mean_score), np.std(collection_mean_score)))
-
-	plt.figure(figsize=[10,8])
-	n, bins, patches = plt.hist(x=collection_best_score, bins='auto', color='#0504aa',alpha=0.7, rwidth=0.85)
-	plt.grid(axis='y', alpha=0.75)
-	plt.xlabel('Value',fontsize=15)
-	plt.xticks(fontsize=15)
-	plt.yticks(fontsize=15)
-	plt.ylabel('Frequency',fontsize=15)
-	plt.title('Distribution of the best solutions',fontsize=15)
-
-	plt.figure(figsize=[10, 8])
-	n, bins, patches = plt.hist(x=collection_mean_score, bins='auto', color='#0504aa', alpha=0.7, rwidth=0.85)
-	plt.grid(axis='y', alpha=0.75)
-	plt.xlabel('Value', fontsize=15)
-	plt.ylabel('Frequency', fontsize=15)
-	plt.xticks(fontsize=15)
-	plt.yticks(fontsize=15)
-	plt.title('Distribution of the mean solutions', fontsize=15)
-
-	plt.show()
-
-histograms()
+# histograms()
 
 # def run_once(args):
 # 	(initial_population_size, p, termination_value,max_iterations) = args
