@@ -7,10 +7,7 @@ def inversion(order: list, c:float,c_accent:float):
         part2 = order[index_c+1:index_c_accent+1]
         part2.reverse()
         part3 = order[index_c_accent+1:]
-        order[:] = part1 + part2 + part3 # If you assign something to elements of that list, this will change the original list
-
-
-
+        order[:] = part1 + part2 + part3 #
 
     elif index_c > index_c_accent:
 
@@ -20,7 +17,7 @@ def inversion(order: list, c:float,c_accent:float):
 
         part_reversed = part3 + part1
         part_reversed.reverse()
-        order[:] = part2 + part_reversed # If you assign something to elements of that list, this will change the original list
+        order[:] = part2 + part_reversed
 
 
     else:

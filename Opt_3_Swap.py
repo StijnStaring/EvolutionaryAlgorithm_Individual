@@ -3,13 +3,10 @@ from copy import deepcopy
 from representation import TravelingSalesPersonProblem
 
 def Opt_3(route_original:list,distanceMatrix,amount_cities,max_iterations=1):
-    # max_iterations = 3
     iteration = 0
     route = deepcopy(route_original)
-    # bit_list = np.ones(amount_cities)
     count = 0
     while count <= amount_cities and iteration < max_iterations:
-        # print("count: %s"%count)
 
         for i in range(amount_cities):
 
@@ -38,7 +35,6 @@ def Opt_3(route_original:list,distanceMatrix,amount_cities,max_iterations=1):
                 previous_city = route[i-1]
                 previous_city_i = i - 1
 
-
             """ 3-opt forward case """
             costs1:list = distanceMatrix[current_city]
             current1:float = costs1[next_city]
@@ -63,7 +59,6 @@ def Opt_3(route_original:list,distanceMatrix,amount_cities,max_iterations=1):
                 city_F = route[city_F_i]
                 costs_c = deepcopy(distanceMatrix[c])
                 costs1_relative = current1 + costs_c[city_D] - costs1[c]
-                # print("cost1_relative: %s" % costs1_relative)
 
                 if previous_city_i >= c_index:
                     not_desired_cities = [city_F,current_city, previous_city, next_city] + route[c_index:previous_city_i]
@@ -75,8 +70,6 @@ def Opt_3(route_original:list,distanceMatrix,amount_cities,max_iterations=1):
                 sorted_candidates_end = sorted(candidates2, key=lambda x: x[1])
 
                 for (city_end,cost_end) in sorted_candidates_end:
-
-                    # take out of the route the part to insert: c -> city_end
                     city_end_i = route.index(city_end)
                     if city_end_i == len(route) - 1:
                         city_end_next_i = 0
@@ -103,14 +96,7 @@ def Opt_3(route_original:list,distanceMatrix,amount_cities,max_iterations=1):
                     for (a, b) in visited_edges:
                         cost_reversed += distanceMatrix[a, b]
 
-                    # if any(abs(x) == np.inf for x in [costs1_relative,distanceMatrix[city_end_next][next_city],distanceMatrix[city_end_next][next_city],distanceMatrix[city_end][city_D],cost_original,cost_reversed]):
-                    #     improvement1 = 0
-                    # else:
-                    # When the tour100 is run an invalid value is encountered. This is not a problem. The code above can take the warning away but is redundant with code below.
                     improvement1 = costs1_relative + distanceMatrix[city_end][city_end_next] - distanceMatrix[city_end_next][next_city]  - distanceMatrix[city_end][city_D] + cost_original - cost_reversed
-                    # print("improvement 1: %s" % improvement1)
-                    # if np.isnan(improvement1):
-                    #     print("stop")
                     memory_cities1 = [city_end_next_i, city_D_i,c,city_end]
                     if improvement1 > 0:
                         break
@@ -157,11 +143,6 @@ def Opt_3(route_original:list,distanceMatrix,amount_cities,max_iterations=1):
                 sorted_candidates_end = sorted(candidates2, key=lambda x: x[1])
 
                 for (city_end, cost_end) in sorted_candidates_end:
-
-                    # take out of the route the part to insert: c -> city_end
-                    # print("city_end: %s" % city_end)
-                    # print(len(route))
-                    # print(len(set(route)))
                     city_end_i = route.index(city_end)
                     if city_end_i == len(route) - 1:
                         city_end_next_i = 0
@@ -170,13 +151,9 @@ def Opt_3(route_original:list,distanceMatrix,amount_cities,max_iterations=1):
 
                     city_end_next = route[city_end_next_i]
 
-                    # if any(abs(x) == np.inf for x in [costs1_relative, distanceMatrix[city_end][city_end_next], distanceMatrix[city_end][city_D], distanceMatrix[previous_city][city_end_next]]):
-                    #     improvement2 = 0
-                    # else:
-                    # When the tour100 is run an invalid value is encountered. This is not a problem. The code above can take the warning away but is redundant with code below.
                     improvement2 = costs1_relative + distanceMatrix[city_end][city_end_next] - distanceMatrix[city_end][city_D] - distanceMatrix[previous_city][city_end_next]
                     memory_cities2 = [city_end_next_i, city_D_i,c,city_end]
-                    # print("improvement 2: %s" % improvement2)
+
                     if improvement2 > 0:
                         break
                 if improvement2 > 0:
@@ -189,12 +166,9 @@ def Opt_3(route_original:list,distanceMatrix,amount_cities,max_iterations=1):
                 count = 0
 
             if improvement1 >= improvement2 and improvement1 > 0:
-                # initial_cost -= improvement1
 
                 city_end_next_i = memory_cities1[0]
                 city_D_i = memory_cities1[1]
-                # c = memory_cities1[2]
-                # city_end = memory_cities1[3]
 
                 insert_part:list
                 if city_D_i >= city_end_next_i:
@@ -218,11 +192,8 @@ def Opt_3(route_original:list,distanceMatrix,amount_cities,max_iterations=1):
                 route = [current_city] + insert_part + part1 + part2
 
             elif improvement1 < improvement2 and improvement2 > 0:
-                # initial_cost -= improvement2
                 city_end_next_i = memory_cities2[0]
                 city_D_i = memory_cities2[1]
-                # c = memory_cities2[2]
-                # city_end = memory_cities2[3]
 
                 insert_part: list
                 if city_D_i >= city_end_next_i:
@@ -247,40 +218,3 @@ def Opt_3(route_original:list,distanceMatrix,amount_cities,max_iterations=1):
 
 
     return route
-
-# def cost(problem: TravelingSalesPersonProblem,order:list):
-#     visited_edges = [(order[i], order[i + 1]) for i in range(0, len(order) - 1)]
-#     visited_edges += [(order[len(order) - 1], order[0])]
-#
-#     path_weight = 0
-#     for (a,b) in visited_edges:
-#         path_weight += problem.get_weight(a,b)
-#
-#     return path_weight
-
-
-# def run1(filename = "tour194.csv"):
-#     import numpy as np
-#     from random import shuffle
-#     try_list = list(range(194))
-#     # try_list = [16, 17, 18, 21, 22, 20, 28, 27, 25, 19, 26, 24, 23, 15, 13, 12, 11, 10, 9, 7, 3, 4, 5, 1, 0, 2, 6, 8, 14]
-#     shuffle(try_list)
-#
-#     file = open(filename)
-#     distanceMatrix = np.loadtxt(file, delimiter=",")
-#     file.close()
-#
-#     problem = TravelingSalesPersonProblem(distanceMatrix)
-#     KOST = cost(problem,try_list)
-#     print("The start KOST: %s" % KOST)
-#
-#     print("Running...")
-#     print("The original route: %s" % try_list)
-#     new_route,new_cost = Opt_3(try_list,KOST,distanceMatrix,len(distanceMatrix))
-#     print("The new route: %s" % new_route)
-#     print("the new cost: %s" % new_cost)
-#     cost_check = cost(problem, new_route)
-#     print("the cost check is: %s" % cost_check)
-#     print("Finished")
-#
-# run1()
