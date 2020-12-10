@@ -294,62 +294,62 @@ convergence_plot()
 
 # histograms()
 
-# def run_once(args):
-# 	(initial_population_size, p, termination_value,max_iterations) = args
-# 	instance = r0620003()
-# 	#print("Running...")
-# 	result = instance.optimize("tour194.csv", initial_population_size=initial_population_size, p=p, termination_value= termination_value, max_iterations = max_iterations)
-# 	return result
+def run_once(args):
+	(initial_population_size, p, termination_value,max_iterations) = args
+	instance = r0620003()
+	#print("Running...")
+	result = instance.optimize("tour29.csv", initial_population_size=initial_population_size, p=p, termination_value= termination_value, max_iterations = max_iterations)
+	return result
 
 
-# if __name__ == "__main__":
-# 	print("Running this file on a PC with %s cores..." % (cpu_count()))
-#
-# 	results_file_name = str(time.time()) + ".txt"
-# 	results_file = open(results_file_name, "w")
-# 	results_file.close()
-#
-# 	poss_initial_population_sizes = [20,75,100,150]
-# 	poss_ps = [0.02, 0.15,0.25]
-# 	poss_termination_values = [100]
-# 	poss_Opt_3_iterations = [1,3,5]
-#
-# 	amount_of_possibilities: int = len(poss_initial_population_sizes) * len(poss_ps) * len(poss_termination_values) * len(poss_Opt_3_iterations)
-# 	current_possibility_index: int = 1
-# 	print("Found %s sets of parameters." % amount_of_possibilities)
-#
-# 	for poss_initial_population_size in poss_initial_population_sizes:
-# 		for poss_p in poss_ps:
-# 			for poss_Opt_3_iteration in poss_Opt_3_iterations:
-# 				for poss_termination_value in poss_termination_values:
-# 						amount_of_iterations = 8
-# 						p = Pool(processes=cpu_count())
-# 						results = p.map(run_once, [(poss_initial_population_size, poss_p, poss_termination_value, poss_Opt_3_iteration) for i in range(amount_of_iterations)])
-#
-# 						# average_score = np.mean(results)
-# 						scores = [i[0] for i in results]
-# 						times = [i[1] for i in results]
-# 						best_score = min(scores)
-# 						avg_score = np.mean(scores)
-# 						avg_times = np.mean(times)
-#
-# 						results_file = open(results_file_name, "a")
-# 						results_file.write("#" * 50 + "\r\n")
-# 						results_file.write("Initial population size: %s" % poss_initial_population_size + "\r\n")
-# 						# results_file.write("Amount of offsprings: %s" % poss_amount_of_offspring + "\r\n")
-# 						# results_file.write("Amount of offsprings: %s" % poss_amount_of_offspring + "\r\n")
-# 						# results_file.write("k (selection): %s" % poss_k + "\r\n")
-# 						results_file.write("p (mutation): %s" % poss_p + "\r\n")
-# 						results_file.write("poss_Opt_3_iteration: %s" % poss_Opt_3_iteration + "\r\n")
-# 						# results_file.write("Recombination rate: %s" % poss_recombination_rate + "\r\n")
-# 						results_file.write("# of termination iterations: %s" % poss_termination_value + "\r\n")
-# 						results_file.write("Best score over %s iterations: %s" % (amount_of_iterations, best_score) + "\r\n")
-# 						results_file.write("Mean score over %s iterations:	%s" % (amount_of_iterations, avg_score) + "\r\n")
-# 						results_file.write("Mean time used:	%s  iterations: %s" % (amount_of_iterations, avg_times) + "\r\n")
-# 						results_file.write(("#" * 50) + "\r\n")
-# 						results_file.close()
-#
-# 						print("Completed %s / %s..." % (current_possibility_index, amount_of_possibilities))
-# 						current_possibility_index += 1
-#
-# 	print("Finished simulation - data written to txt file.")
+if __name__ == "__main__":
+	print("Running this file on a PC with %s cores..." % (cpu_count()))
+
+	results_file_name = str(time.time()) + ".txt"
+	results_file = open(results_file_name, "w")
+	results_file.close()
+
+	poss_initial_population_sizes = [20,75,100,150]
+	poss_ps = [0.02, 0.15,0.25]
+	poss_termination_values = [100]
+	poss_Opt_3_iterations = [1,3,5]
+
+	amount_of_possibilities: int = len(poss_initial_population_sizes) * len(poss_ps) * len(poss_termination_values) * len(poss_Opt_3_iterations)
+	current_possibility_index: int = 1
+	print("Found %s sets of parameters." % amount_of_possibilities)
+
+	for poss_initial_population_size in poss_initial_population_sizes:
+		for poss_p in poss_ps:
+			for poss_Opt_3_iteration in poss_Opt_3_iterations:
+				for poss_termination_value in poss_termination_values:
+						amount_of_iterations = 8
+						p = Pool(processes=cpu_count())
+						results = p.map(run_once, [(poss_initial_population_size, poss_p, poss_termination_value, poss_Opt_3_iteration) for i in range(amount_of_iterations)])
+
+						# average_score = np.mean(results)
+						scores = [i[0] for i in results]
+						times = [i[1] for i in results]
+						best_score = min(scores)
+						avg_score = np.mean(scores)
+						avg_times = np.mean(times)
+
+						results_file = open(results_file_name, "a")
+						results_file.write("#" * 50 + "\r\n")
+						results_file.write("Initial population size: %s" % poss_initial_population_size + "\r\n")
+						# results_file.write("Amount of offsprings: %s" % poss_amount_of_offspring + "\r\n")
+						# results_file.write("Amount of offsprings: %s" % poss_amount_of_offspring + "\r\n")
+						# results_file.write("k (selection): %s" % poss_k + "\r\n")
+						results_file.write("p (mutation): %s" % poss_p + "\r\n")
+						results_file.write("poss_Opt_3_iteration: %s" % poss_Opt_3_iteration + "\r\n")
+						# results_file.write("Recombination rate: %s" % poss_recombination_rate + "\r\n")
+						results_file.write("# of termination iterations: %s" % poss_termination_value + "\r\n")
+						results_file.write("Best score over %s iterations: %s" % (amount_of_iterations, best_score) + "\r\n")
+						results_file.write("Mean score over %s iterations:	%s" % (amount_of_iterations, avg_score) + "\r\n")
+						results_file.write("Mean time used:	%s  iterations: %s" % (amount_of_iterations, avg_times) + "\r\n")
+						results_file.write(("#" * 50) + "\r\n")
+						results_file.close()
+
+						print("Completed %s / %s..." % (current_possibility_index, amount_of_possibilities))
+						current_possibility_index += 1
+
+	print("Finished simulation - data written to txt file.")
