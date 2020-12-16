@@ -1,7 +1,7 @@
 import numpy as np
 from copy import deepcopy
 from random import  random, randint, choice,shuffle
-import time
+import Reporter
 
 class TravelingSalesPersonIndividual:
 	def __init__(self):
@@ -83,42 +83,6 @@ def Nearest_Neighbor(amount_of_cities_to_visit, cost_matrix_original, random_num
 		NN_route, random_numbers_to_start = Nearest_Neighbor(amount_of_cities_to_visit, cost_matrix_original,random_numbers_to_start)
 
 	return NN_route, random_numbers_to_start
-
-class Reporter:
-
-	def __init__(self, filename):
-		self.allowedTime = 300
-		self.numIterations = 0
-		self.filename = filename + ".csv"
-		self.delimiter = ','
-		self.startTime = time.time()
-		self.writingTime = 0
-		outFile = open(self.filename, "w")
-		outFile.write("# Student number: " + filename + "\n")
-		outFile.write("# Iteration, Elapsed time, Mean value, Best value, Cycle\n")
-		outFile.close()
-
-	# Append the reported mean objective value, best objective value, and the best tour
-	# to the reporting file.
-	#
-	# Returns the time that is left in seconds as a floating-point number.
-	def report(self, meanObjective, bestObjective, bestSolution):
-		if time.time() - self.startTime < self.allowedTime + self.writingTime:
-			start = time.time()
-
-			outFile = open(self.filename, "a")
-			outFile.write(str(self.numIterations) + self.delimiter)
-			outFile.write(str(start - self.startTime - self.writingTime) + self.delimiter)
-			outFile.write(str(meanObjective) + self.delimiter)
-			outFile.write(str(bestObjective) + self.delimiter)
-			for i in range(bestSolution.size):
-				outFile.write(str(bestSolution[i]) + self.delimiter)
-			outFile.write('\n')
-			outFile.close()
-
-			self.numIterations += 1
-			self.writingTime += time.time() - start
-		return (self.allowedTime + self.writingTime) - (time.time() - self.startTime)
 
 def Opt_3(route_original:list,distanceMatrix,amount_cities,max_iterations=1):
 	iteration = 0
@@ -363,8 +327,7 @@ def inversion(order: list, c:float,c_accent:float):
 class r0620003:
 
 	def __init__(self):
-		self.reporter = Reporter(self.__class__.__name__)
-	# 	self.reporter = Reporter.Reporter(self.__class__.__name__) --> Reporter class included in this file
+		self.reporter = Reporter.Reporter(self.__class__.__name__)
 
 	@staticmethod
 	def initialize_population(problem: TravelingSalesPersonProblem, amount_of_cities_to_visit: int, initial_population_size: int, max_iterations:int) -> list:
@@ -382,15 +345,27 @@ class r0620003:
 		print('population initiated')
 		return population
 
-	def optimize(self, filename, initial_population_size: int = 100, p: float = 0.02, termination_value: float =  10, max_iterations: int = 1):
+	def optimize(self, filename, initial_population_size: int = 75, p: float = 0.02, termination_value: float =  100, max_iterations: int = 3):
 
 		# Read distance matrix from file.		
 		file = open(filename)
 		distanceMatrix = np.loadtxt(file, delimiter=",")
 		file.close()
+		amount_of_cities_to_visit = len(distanceMatrix)
+
+		# Change the parameters depending on the size of the problem:
+		if amount_of_cities_to_visit <= 50:
+			initial_population_size = 100
+			max_iterations = 5
+			termination_value = 30
+
+		elif amount_of_cities_to_visit > 500:
+			initial_population_size = 10
+			max_iterations = 1
+
+		print("init pop: %s ; p: %s ; termination value: %s ; max_iterations: %s ;" % (initial_population_size,p,termination_value,max_iterations))
 
 		timeLeft: float
-		amount_of_cities_to_visit = len(distanceMatrix)
 		problem: TravelingSalesPersonProblem = TravelingSalesPersonProblem(distanceMatrix)
 		population: list = self.initialize_population(problem,amount_of_cities_to_visit, initial_population_size,max_iterations)
 
