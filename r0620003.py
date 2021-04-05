@@ -359,7 +359,7 @@ class r0620003:
 			max_iterations = 5
 			termination_value = 30
 
-		elif amount_of_cities_to_visit > 500:
+		elif amount_of_cities_to_visit > 250:
 			initial_population_size = 10
 			max_iterations = 1
 
